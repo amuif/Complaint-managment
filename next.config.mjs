@@ -22,7 +22,6 @@ const nextConfig = {
       outputFileTracingExcludes: {
         "*": ["**/*"],
       },
-    
     // Add this to prevent memory issues
     workerThreads: false,
     cpus: 1,
