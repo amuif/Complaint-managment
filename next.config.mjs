@@ -18,11 +18,11 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    experimental: {
+   
       outputFileTracingExcludes: {
         "*": ["**/*"],
       },
-    },
+    
     // Add this to prevent memory issues
     workerThreads: false,
     cpus: 1,
