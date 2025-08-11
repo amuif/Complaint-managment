@@ -10,10 +10,6 @@ const nextConfig = {
     unoptimized: true,
   },
   output: 'standalone',
-  // Remove experimental.outputFileTracingIncludes and add this instead:
-  outputFileTracingIncludes: {
-    '/*': ['./**/*'],
-  },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
