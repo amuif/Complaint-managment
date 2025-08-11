@@ -356,7 +356,7 @@ export default function SystemSettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="apiKey">{t('apiKey')}</Label>
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   <Input
                     id="apiKey"
                     defaultValue="sk_live_51NZVgHJKLMNOPQRSTUVWXYZ12345678901234567890"
@@ -364,7 +364,7 @@ export default function SystemSettingsPage() {
                     className="flex-1"
                   />
                   <Button variant="outline">{t('regenerate')}</Button>
-                </div>
+                </div> */}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="webhookUrl">{t('webhookUrl')}</Label>
