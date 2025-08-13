@@ -10,6 +10,7 @@ import { Team } from '@/types/team';
 import { Department } from '@/types/department';
 import { Subcities } from '@/types/subcities';
 import { Feedback } from '@/types/feedback';
+import { User } from '@/types/user';
 
 // Base API configuration and helper functions
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend.torobingo.com/api'; // || 'http://196.189.93.235:4000/api';
@@ -31,18 +32,6 @@ interface publicApiResponse {
   success: boolean;
   data: Complaint[];
 }
-
-export interface User {
-  id: number;
-  username: string;
-  role: 'SuperAdmin' | 'SubCityAdmin' | 'Admin';
-  city: string | null;
-  subcity: string | null;
-  section: string | null;
-  department: string | null;
-  profile_picture: string | null;
-}
-
 export interface AuthResponse {
   message: string;
   token: string;
@@ -763,13 +752,17 @@ export const adminApi = {
   },
 
   getAdmins: async (token: string): Promise<User[]> => {
-    const response = await fetch(`${API_BASE_URL}/admin/log-admins`, {
-      headers: getAuthHeaders(token),
-    });
-    return handleResponse<User[]>(response);
-  },
-
-  // Reports
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin`, {
+        headers: getAuthHeaders(token),
+      });
+      const data = await handleDataResponse<User[]>(response);
+      return data;
+    } catch (error) {
+      console.log('error at getting admins', error);
+      return [];
+    }
+  }, // Reports
   exportReport: async (token: string, params?: any): Promise<Blob> => {
     const queryParams = new URLSearchParams();
     if (params) {

@@ -1,15 +1,7 @@
+import { Subcities } from '@/types/subcities';
+import { User } from '@/types/user';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-interface User {
-  id: number;
-  username: string;
-  role: string;
-  city?: string;
-  subcity?: string;
-  section?: string;
-  department?: string;
-  profile_picture?: string;
-}
 
 interface AuthState {
   token: string | null;
@@ -106,23 +98,23 @@ export const isDepartmentAdmin = (user: User | null): boolean => {
   return user?.role === 'Admin';
 };
 
-export const hasAccessToSection = (user: User | null, section: string): boolean => {
-  if (!user) return false;
-  if (user.role === 'SuperAdmin') return true;
-  if (user.role === 'SubCityAdmin') return user.subcity === section;
-  return user.section === section || user.section === 'all';
-};
+// export const hasAccessToSection = (user: User | null, section: string): boolean => {
+//   if (!user) return false;
+//   if (user.role === 'SuperAdmin') return true;
+//   if (user.role === 'SubCityAdmin') return user.subcity === subcity.name_en;
+//   return user.section === section || user.section === 'all';
+// };
 
 export const hasAccessToDepartment = (user: User | null, department: string): boolean => {
   if (!user) return false;
   if (user.role === 'SuperAdmin') return true;
-  if (user.role === 'Admin') return user.department === department;
+  // if (user.role === 'Admin') return user.department === department;
   return false;
 };
 
-export const hasAccessToSubcity = (user: User | null, subcity: string): boolean => {
-  if (!user) return false;
-  if (user.role === 'SuperAdmin') return true;
-  if (user.role === 'SubCityAdmin') return user.subcity === subcity;
-  return false;
-};
+// export const hasAccessToSubcity = (user: User | null, subcity: string): boolean => {
+//   if (!user) return false;
+//   if (user.role === 'SuperAdmin') return true;
+//   if (user.role === 'SubCityAdmin') return user.subcity === subcity;
+//   return false;
+// };

@@ -17,11 +17,8 @@ import {
   X,
   Bell,
   Search,
-  UserCog,
   Building2,
-  Map,
   Star,
-  ChevronDown,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -56,12 +53,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { logout, user } = useAuth();
 
   const handleLogout = (e: React.MouseEvent) => {
@@ -79,7 +74,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('allEmployees'), href: '/superadmin/employees', icon: Users },
     { name: t('allFeedback'), href: '/superadmin/feedback', icon: FileText },
     { name: t('allRatings'), href: '/superadmin/ratings', icon: Star },
-    { name: t('organization'), href: '/superadmin/organization', icon: Building2 },
+    { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
+    { name: t('Admins'), href: '/superadmin/admins', icon: Building2 },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
     { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
   ];

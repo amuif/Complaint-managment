@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api';
@@ -33,6 +33,14 @@ export function useAuth() {
     onError: (error: Error) => {
       setLoading(false);
       setError(error.message);
+    },
+  });
+
+  const getAdminMutation = useQuery({
+    queryKey: ['get-admins'],
+    queryFn: async () => {
+      if (!token) throw new Error('Authentication required');
+      return adminApi.getAdmins(token);
     },
   });
 
@@ -88,6 +96,7 @@ export function useAuth() {
     updateProfileError: updateProfileMutation.error,
 
     // Admin management (SuperAdmin only)
+    getAdmins: getAdminMutation.data || [],
     createAdmin: createAdminMutation.mutate,
     isCreatingAdmin: createAdminMutation.isPending,
     createAdminError: createAdminMutation.error,
