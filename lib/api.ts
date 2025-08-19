@@ -29,7 +29,6 @@ interface ApiResponse {
   data: Complaint[];
 }
 interface publicApiResponse {
-  success: boolean;
   data: Complaint[];
 }
 export interface AuthResponse {
@@ -514,21 +513,16 @@ export const adminApi = {
   },
 
   // Public complaints management
-  getPublicComplaints: async (token: string, lang?: string): Promise<publicApiResponse> => {
+  getPublicComplaints: async (token: string, lang?: string): Promise<Complaint[]> => {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/complaints`, {
         method: 'GET',
         headers: getAuthHeaders(token),
       });
-      return handleResponse<publicApiResponse>(response);
+      return handleResponse<Complaint[]>(response);
     } catch (error) {
       console.error('error while getting public complaint ', error);
-      return {
-        success: false,
-        data: [],
-        message: 'Failed to fetch public complaints',
-        error: error instanceof Error ? error.message : String(error),
-      } as publicApiResponse;
+      return [];
     }
   },
 

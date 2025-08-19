@@ -50,9 +50,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
-import { VoiceFeedback } from '../voice-player';
-import { toast } from 'sonner';
-import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
+import { handleApiSuccess } from '@/lib/error-handler';
 import { ComplaintDetailsDialog } from '../complaint-details-dialog';
 import { Complaint } from '@/types/complaint';
 
@@ -116,10 +114,6 @@ export function ComplaintManagementTable({
     isRespondingToPublicComplaint,
     editPublicComplaintStatus,
   } = useComplaints();
-  useEffect(() => {
-    console.log(complaints);
-  }, [complaints]);
-
   useEffect(() => {
     if (opedEditStatus?.complaint?.status) {
       setStatus(opedEditStatus.complaint.status);

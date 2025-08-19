@@ -33,8 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isSuperAdmin = user?.role === adminRoles.SuperAdmin;
   const isSubCityAdmin = user?.role === adminRoles.Admin;
-  const userSection = user?.subcity?.name_en || null;
+  const userSection = user?.subcity?.name_en|| null;
 
+  // Route protection logic
   useEffect(() => {
     // Skip for public routes
     if (

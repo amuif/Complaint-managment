@@ -24,6 +24,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { handleApiSuccess, handleApiError } from '@/lib/error-handler';
 import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PICTURE_URL } from '@/constants/base_url';
 
 const userUpdateSchema = z.object({
   first_name: z.string().min(1, 'First name is required').nullable(),
@@ -237,7 +238,8 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
                           formState.profile_picture instanceof File
                             ? URL.createObjectURL(formState.profile_picture)
                             : typeof formState.profile_picture === 'string'
-                              ? formState.profile_picture
+                              ? `${PICTURE_URL}${formState.profile_picture}
+`
                               : undefined
                         }
                         alt="Profile preview"

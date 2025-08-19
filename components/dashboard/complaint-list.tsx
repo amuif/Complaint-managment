@@ -1,32 +1,148 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, MoreHorizontal } from 'lucide-react';
-import { ComplaintItem } from '@/components/dashboard/complaint-item';
+import { useEffect, useState } from 'react';
+import { MoreHorizontal, Send } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Complaint } from '@/types/complaint';
-
+import { Button } from '../ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '../ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { format, parseISO } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { handleApiSuccess } from '@/lib/error-handler';
+import { Textarea } from '../ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { ComplaintDetailsDialog } from '../complaint-details-dialog';
 interface ComplaintListProps {
   searchQuery: string;
   statusFilter: string;
   priorityFilter: string;
 }
+const statusOptions = [
+  { label: 'Submitted', value: 'submitted' },
+  { label: 'Under Review', value: 'under review' },
+  { label: 'Investigating', value: 'investigating' },
+  { label: 'Resolved', value: 'resolved' },
+  { label: 'Closed', value: 'closed' },
+  { label: 'Opened', value: 'Opened' },
+] as const;
+
+type ComplaintStatus = (typeof statusOptions)[number]['value'];
 
 export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: ComplaintListProps) {
   const { t } = useLanguage();
-  const { complaints, isLoading } = useComplaints();
+  const {
+    publicComplaints,
+    isLoading,
+    respondToComplaint,
+    respondToPublicComplaint,
+    isRespondingToComplaint,
+    isRespondingToPublicComplaint,
+    editPublicComplaintStatus,
+  } = useComplaints();
   const [activeMenuComplaint, setActiveMenuComplaint] = useState<number | null>(null);
   const [detailsComplaintId, setDetailsComplaintId] = useState<number | null>(null);
   const [editStatusComplaintId, setEditStatusComplaintId] = useState<number | null>(null);
   const [newStatus, setNewStatus] = useState<string>('Open');
+  const [selectedComplaints, setSelectedComplaints] = useState<string[]>([]);
+  const [sorting, setSorting] = useState<{
+    column: string;
+    direction: 'asc' | 'desc';
+  }>({
+    column: 'created_at',
+    direction: 'desc',
+  });
+  const [responseDialog, setResponseDialog] = useState<{
+    isOpen: boolean;
+    complaint: Complaint | null;
+  }>({ isOpen: false, complaint: null });
+  const [responseText, setResponseText] = useState('');
+  const [openDetails, setOpenDetails] = useState<{
+    isOpen: boolean;
+    complaint: Complaint | null;
+  }>({ isOpen: false, complaint: null });
+  const [opedEditStatus, setOpenEditStatus] = useState<{
+    isOpen: boolean;
+    complaint: Complaint | null;
+  }>({ isOpen: false, complaint: null });
+  const handleSubmitResponse = () => {
+    if (!responseDialog.complaint || !responseText.trim()) return;
+    try {
+      const isPublicComplaint = responseDialog.complaint.complaint_source === 'public_complaint';
+
+      if (isPublicComplaint) {
+        respondToPublicComplaint({
+          id: responseDialog.complaint.id,
+          response: responseText.trim(),
+          status: status || 'resolved',
+        });
+      } else {
+        respondToComplaint({
+          id: responseDialog.complaint.id,
+          response: responseText.trim(),
+          status: status || 'resolved',
+        });
+      }
+    } catch (error) {
+      console.error('Error at responind to complaint', error);
+    }
+
+    setResponseDialog({ isOpen: false, complaint: null });
+    setResponseText('');
+  };
+
+  useEffect(() => {
+    console.log(publicComplaints);
+  }, [publicComplaints]);
+  const handleRespond = (complaint: Complaint) => {
+    setResponseDialog({ isOpen: true, complaint });
+    setResponseText('');
+  };
+  const handleDetials = (complaint: Complaint) => {
+    setOpenDetails({ isOpen: true, complaint });
+    setResponseText('');
+  };
+  const handleEditStatus = (complaint: Complaint) => {
+    setOpenEditStatus({ isOpen: true, complaint });
+    setResponseText('');
+  };
+  const formatDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'MMM dd, yyyy HH:mm');
+    } catch {
+      return 'Invalid date';
+    }
+  };
 
   // Filtering logic
-  const filteredComplaints = complaints.filter((complaint: Complaint) => {
+  const filteredComplaints = publicComplaints.filter((complaint: Complaint) => {
     const matchesSearch =
       (complaint.description_en || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ((complaint.Employee?.first_name_en || '') + ' ' + (complaint.Employee?.last_name_en || ''))
+      ((complaint.employee?.first_name_en || '') + ' ' + (complaint.employee?.last_name_en || ''))
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
@@ -34,6 +150,16 @@ export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: Com
     const matchesPriority = priorityFilter === 'all' || complaint.priority === priorityFilter;
 
     return matchesSearch && matchesStatus && matchesPriority;
+  });
+  const displayedComplaints = filteredComplaints.sort((a, b) => {
+    const aValue = a[sorting.column as keyof typeof a] || '';
+    const bValue = b[sorting.column as keyof typeof b] || '';
+
+    if (sorting.direction === 'asc') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
   });
 
   // Copy tracking code
@@ -44,12 +170,23 @@ export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: Com
     });
   };
 
-  // Edit status logic (should be replaced with real API call)
-  const handleEditStatus = (id: number) => {
-    // TODO: Replace with mutation/API call
-    alert('Status updated to ' + newStatus);
-    setEditStatusComplaintId(null);
-    setActiveMenuComplaint(null);
+  const handleSelectComplaint = (complaintId: string) => {
+    setSelectedComplaints((prev) =>
+      prev.includes(complaintId) ? prev.filter((id) => id !== complaintId) : [...prev, complaintId]
+    );
+  };
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'resolved':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'pending':
+      case 'open':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'in progress':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
   };
 
   // Loading state
@@ -67,130 +204,151 @@ export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: Com
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        {filteredComplaints.map((complaint) => (
-          <div key={complaint.id} className="flex justify-between items-center relative">
-            <ComplaintItem complaint={complaint} />
-            <div>
-              <button
-                onClick={() =>
-                  setActiveMenuComplaint(activeMenuComplaint === complaint.id ? null : complaint.id)
+    <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Contact</TableHead>
+            <TableHead>Teams</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {displayedComplaints.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={9} className="h-24 text-center">
+                No complaints found. Try adjusting your filters.
+              </TableCell>
+            </TableRow>
+          ) : (
+            displayedComplaints.map((complaint) => (
+              <TableRow
+                key={complaint.id}
+                className={
+                  selectedComplaints.includes(complaint.id.toString()) ? 'bg-muted/50' : ''
                 }
-                aria-label="More options"
-                className="p-1"
               >
-                <MoreHorizontal className="h-6 w-6" />
-              </button>
-              {activeMenuComplaint === complaint.id && (
-                <div className="absolute right-0 z-10 mt-2 w-48 bg-white border rounded shadow-lg">
-                  <button
-                    onClick={() => {
-                      handleCopyTrackingCode(complaint.trackingCode || '');
-                      setActiveMenuComplaint(null);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    aria-label="Copy tracking code"
-                  >
-                    {t('copyTrackingCode') || 'Copy Tracking Code'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setDetailsComplaintId(complaint.id);
-                      setActiveMenuComplaint(null);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    aria-label="View complaint details"
-                  >
-                    {t('viewDetails') || 'View Details'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setNewStatus(complaint.status);
-                      setEditStatusComplaintId(complaint.id);
-                      setActiveMenuComplaint(null);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    aria-label="Edit complaint status"
-                  >
-                    {t('editStatus') || 'Edit Status'}
-                  </button>
+                <TableCell className="font-medium">#{complaint.phone_number}</TableCell>
+                <TableCell className="max-w-[300px]">
+                  <div className="truncate" title="Description">
+                    {complaint.complaint_description}
+                  </div>
+                </TableCell>
+                <TableCell>{complaint.phone_number}</TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">
+                      {complaint?.department?.name_en || 'Unassigned'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {complaint.sub_city?.name_en || 'subcity not assigned'}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusColor(complaint.status!)}>
+                    <span className="flex items-center gap-1">{complaint.status}</span>
+                  </Badge>
+                </TableCell>
+                <TableCell>{formatDate(complaint.created_at)}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          navigator.clipboard.writeText(complaint.phone_number);
+                          handleApiSuccess('Tracking code copied successfully');
+                        }}
+                      >
+                        Copy tracking code
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleRespond(complaint)}>
+                        Respond
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDetials(complaint)}>
+                        View details
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+      <Dialog
+        open={responseDialog.isOpen}
+        onOpenChange={(open) => setResponseDialog({ isOpen: open, complaint: null })}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Respond to Complaint</DialogTitle>
+            <DialogDescription>
+              Send a response to this complaint. The customer will be notified.
+            </DialogDescription>
+          </DialogHeader>
+          {responseDialog.complaint && (
+            <div className="space-y-4">
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-sm font-medium">
+                  Complaint #{responseDialog.complaint.phone_number}
+                </p>
+                <div className="flex flex-col py-2">
+                  <p className="text-base">Description</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2 truncate">
+                    {responseDialog.complaint.complaint_description}
+                  </p>
                 </div>
+              </div>
+              <Textarea
+                placeholder="Type your response here..."
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResponseDialog({ isOpen: false, complaint: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitResponse}
+              disabled={
+                !responseText.trim() || isRespondingToComplaint || isRespondingToPublicComplaint
+              }
+            >
+              {(isRespondingToComplaint || isRespondingToPublicComplaint) && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
               )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredComplaints.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-          <h3 className="mt-4 text-lg font-semibold">{t('noComplaintsFound')}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t('adjustFiltersComplaints')}</p>
-        </div>
+              <Send className="w-4 h-4 mr-1" />
+              Send Response
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {openDetails.complaint && (
+        <ComplaintDetailsDialog
+          openDetails={openDetails}
+          setOpenDetails={setOpenDetails}
+          formatDate={formatDate}
+        />
       )}
-
-      {/* Details Section */}
-      {detailsComplaintId && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/30">
-          <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full relative">
-            <h3 className="text-lg font-semibold mb-2">
-              {t('complaintDetails') || 'Complaint Details'}
-            </h3>
-            <p>
-              <strong>{t('description') || 'Description'}:</strong>{' '}
-              {filteredComplaints.find((c) => c.id === detailsComplaintId)?.description_en}
-            </p>
-            <p>
-              <strong>{t('assignedTo') || 'Assigned To'}:</strong>{' '}
-              {filteredComplaints.find((c) => c.id === detailsComplaintId)?.Employee?.first_name_en}{' '}
-              {filteredComplaints.find((c) => c.id === detailsComplaintId)?.Employee?.last_name_en}
-            </p>
-            <p>
-              <strong>{t('status') || 'Status'}:</strong>{' '}
-              {filteredComplaints.find((c) => c.id === detailsComplaintId)?.status}
-            </p>
-            <button
-              onClick={() => setDetailsComplaintId(null)}
-              className="mt-4 text-blue-600 underline"
-            >
-              {t('close') || 'Close'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Status Modal */}
-      {editStatusComplaintId && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-xs">
-            <h4 className="font-semibold mb-2">{t('editStatus') || 'Edit Status'}</h4>
-            <select
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-              className="border p-2 rounded w-full mb-4"
-              aria-label="Select complaint status"
-            >
-              <option value="Open">{t('open') || 'Open'}</option>
-              <option value="In Progress">{t('inProgress') || 'In Progress'}</option>
-              <option value="Resolved">{t('resolved') || 'Resolved'}</option>
-            </select>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleEditStatus(editStatusComplaintId)}
-                className="bg-blue-600 text-white px-4 py-2 rounded flex-1"
-              >
-                {t('updateStatus') || 'Update Status'}
-              </button>
-              <button
-                onClick={() => setEditStatusComplaintId(null)}
-                className="bg-red-600 text-white px-4 py-2 rounded flex-1"
-              >
-                {t('cancel') || 'Cancel'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

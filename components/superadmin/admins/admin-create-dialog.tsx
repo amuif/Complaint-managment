@@ -79,7 +79,7 @@ const userCreateSchema = z.object({
   email: z.string().email('Invalid email').optional(),
   phone: z.string().min(1, 'Phone is required'),
   city: z.string().min(1, 'City is required'),
-  role: z.number(),
+  role: z.string(),
   subcity_id: z.string().min(1, 'Subcity is required'),
   sector_id: z.string().min(1, 'Sector is required'),
   division_id: z.string().optional(),
@@ -143,7 +143,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
     }
 
     const creatableRoles = getCreatableRoles(user.role);
-    if (!creatableRoles.includes(data.role)) {
+    if (!creatableRoles.includes(data.role as adminRoles)) {
       handleApiError(new Error('Cannot create user with a higher or equal role'));
       return;
     }
@@ -309,7 +309,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                       return (
                         <Select
                           value={field.value?.toString()}
-                          onValueChange={(value) => field.onChange(Number(value))}
+                          onValueChange={(value) => field.onChange(value as adminRoles)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select Role" />

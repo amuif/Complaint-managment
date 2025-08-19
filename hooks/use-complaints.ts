@@ -37,10 +37,7 @@ export function useComplaints(params?: { phone_number?: string; tracking_code?: 
     queryFn: async () => {
       if (!token) throw new Error('Authentication required');
       try {
-        const result = await adminApi.getPublicComplaints(token, language);
-        return Array.isArray(result.data)
-          ? result.data.map((item) => ({ ...item, type: 'publicComplaint' }))
-          : [];
+        return await adminApi.getPublicComplaints(token, language);
       } catch (error) {
         console.error('Error fetching public complaints:', error);
         return [];

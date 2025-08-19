@@ -15,25 +15,22 @@ export function ComplaintStats() {
   });
   const [loading, setLoading] = useState(true);
   const { publicComplaints } = useComplaints();
+
   useEffect(() => {
-    console.log(publicComplaints);
+    if (!publicComplaints || publicComplaints.length === 0) {
+      setStats({ open: 0, inProgress: 0, resolved: 0, total: 0 });
+      setLoading(false);
+      return;
+    }
+
+    const open = publicComplaints.filter((c) => c.status === 'submitted').length;
+    const inProgress = publicComplaints.filter((c) => c.status === 'investigating').length;
+    const resolved = publicComplaints.filter((c) => c.status === 'resolved').length;
+    const total = publicComplaints.length;
+
+    setStats({ open, inProgress, resolved, total });
+    setLoading(false);
   }, [publicComplaints]);
-
-  useEffect(() => {
-    // Fetch complaint statistics
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-      } catch (error) {
-        console.error('Error fetching complaint stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
   const statCards = [
     {
       title: 'Open Complaints',

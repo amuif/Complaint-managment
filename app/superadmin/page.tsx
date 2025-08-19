@@ -31,7 +31,7 @@ export default function SuperAdminDashboardPage() {
   const { employees, isLoading: employeesLoading } = useEmployees();
 
   // Calculate metrics from real data
-  const totalComplaints = (complaints?.length || 0) + (publicComplaints?.length || 0);
+  const totalComplaints = publicComplaints?.length || 0;
   const resolvedComplaints = [
     ...(Array.isArray(complaints) ? complaints : []),
     ...(Array.isArray(publicComplaints) ? publicComplaints : []),

@@ -25,6 +25,7 @@ export function useAuth() {
       login(data.token, data.admin);
       setLoading(false);
       // Redirect based on role
+      console.log('user', adminRoles.SuperAdmin);
       if (
         data.admin.role === adminRoles.SuperAdmin ||
         data.admin.role === adminRoles.SuperAdminSupporter

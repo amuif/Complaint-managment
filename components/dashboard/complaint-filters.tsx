@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useComplaints } from '@/hooks/use-complaints';
 
 interface ComplaintFiltersProps {
   statusFilter: string;
@@ -20,40 +21,21 @@ interface ComplaintFiltersProps {
   setPriorityFilter: (value: string) => void;
 }
 
+const ALL_STATUSES = ['submitted', 'under_review', 'investigating', 'resolved', 'closed'];
+
+const ALL_PRIORITIES = ['low', 'normal', 'high', 'urgent'];
+
 export function ComplaintFilters({
   statusFilter,
   setStatusFilter,
   priorityFilter,
   setPriorityFilter,
 }: ComplaintFiltersProps) {
-  const [statuses, setStatuses] = useState<string[]>([]);
-  const [priorities, setPriorities] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Fetch statuses and priorities from the API
-    const fetchFilters = async () => {
-      try {
-        const statusResponse = await fetch('/api/complaint-statuses');
-        const statusData = await statusResponse.json();
-        setStatuses(['all', ...statusData]);
-
-        const priorityResponse = await fetch('/api/complaint-priorities');
-        const priorityData = await priorityResponse.json();
-        setPriorities(['all', ...priorityData]);
-      } catch (error) {
-        console.error('Error fetching filters:', error);
-        // Fallback values if API fails
-        setStatuses(['all', 'Open', 'In Progress', 'Under Review', 'Resolved']);
-        setPriorities(['all', 'Urgent', 'High', 'Medium', 'Low']);
-      }
-    };
-
-    fetchFilters();
-  }, []);
-
   return (
     <div className="flex items-center gap-2">
       <Filter className="h-4 w-4 text-muted-foreground" />
+
+      {/* Status Filter */}
       <Select value={statusFilter} onValueChange={setStatusFilter}>
         <SelectTrigger className="w-[140px] rounded-full">
           <SelectValue placeholder="Status" />
@@ -61,15 +43,16 @@ export function ComplaintFilters({
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>
-            {statuses.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status === 'all' ? 'All Statuses' : status}
+            {['all', ...ALL_STATUSES].map((s) => (
+              <SelectItem key={s} value={s}>
+                {s === 'all' ? 'All Statuses' : s.replace('_', ' ')}
               </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
 
+      {/* Priority Filter */}
       <Select value={priorityFilter} onValueChange={setPriorityFilter}>
         <SelectTrigger className="w-[140px] rounded-full">
           <SelectValue placeholder="Priority" />
@@ -77,9 +60,9 @@ export function ComplaintFilters({
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Priority</SelectLabel>
-            {priorities.map((priority) => (
-              <SelectItem key={priority} value={priority}>
-                {priority === 'all' ? 'All Priorities' : priority}
+            {['all', ...ALL_PRIORITIES].map((p) => (
+              <SelectItem key={p} value={p}>
+                {p === 'all' ? 'All Priorities' : p}
               </SelectItem>
             ))}
           </SelectGroup>

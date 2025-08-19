@@ -32,9 +32,9 @@ export interface User {
   subcity: Subcities | null;
 }
 export enum adminRoles {
-  SuperAdmin,
-  SuperAdminSupporter,
-  Admin,
-  Editor,
-  Viewer,
+  SuperAdmin = 'SuperAdmin',
+  SuperAdminSupporter = 'SuperAdminSupporter',
+  Admin = 'Admin',
+  Editor = 'Editor',
+  Viewer = 'Viewer',
 }
