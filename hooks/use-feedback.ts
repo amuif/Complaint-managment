@@ -87,7 +87,7 @@ export function useFeedback() {
     error: feedbackQuery.error,
 
     // Public feedback (admin view)
-    publicFeedback: publicFeedbackQuery.data || [],
+    publicFeedback: publicFeedbackQuery.data || null,
     isLoadingPublicFeedback: publicFeedbackQuery.isLoading,
 
     // Submit feedback (public)

@@ -52,7 +52,7 @@ export default function FeedbackPage() {
               <CardDescription>{t('viewAllFeedback')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <FeedbackList searchQuery={searchQuery} dateRange={dateRange} type="all" />
+              <FeedbackList />
             </CardContent>
           </Card>
         </TabsContent>

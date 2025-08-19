@@ -6,9 +6,15 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Star, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { useEffect } from 'react';
 
 export function FeedbackList() {
   const { feedback, publicFeedback, isLoading, isError } = useFeedback();
+  useEffect(() => {
+    if (publicFeedback) {
+      console.log(publicFeedback.feedback);
+    }
+  }, [publicFeedback]);
 
   if (isLoading) {
     return (
@@ -57,11 +63,10 @@ export function FeedbackList() {
     );
   }
 
-  // Combine both feedback sources and sort by date
-  const allFeedback = [...(feedback || []), ...(publicFeedback || [])]
+  const allFeedback = [...(feedback || []), ...(publicFeedback?.feedback || [])]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 5); // Show only the 5 most recent
-
+  //
   const getRatingStars = (rating: number | null) => {
     if (!rating) return null;
 
@@ -125,27 +130,23 @@ export function FeedbackList() {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{item.phone_number}</span>
-                      {item.rating && getRatingBadge(item.rating)}
-                    </div>
                     <span className="text-xs text-muted-foreground">
                       {format(parseISO(item.created_at), 'MMM dd')}
                     </span>
                   </div>
 
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{item.comment}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                    {item.feedback_text}
+                  </p>
 
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>Section: {item.section}</span>
+                    <span>Subcity: {item.subcity.name_en}</span>
                     {item.employee && (
                       <span>
-                        • Employee: {item.employee.first_name} {item.employee.last_name}
+                        • Employee: {item.employee.first_name_en} {item.employee.last_name_en}
                       </span>
                     )}
                   </div>
-
-                  {item.rating && <div className="mt-2">{getRatingStars(item.rating)}</div>}
                 </div>
               </div>
             ))

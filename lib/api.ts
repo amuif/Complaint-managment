@@ -28,6 +28,10 @@ interface ApiResponse {
   success: boolean;
   data: Complaint[];
 }
+interface ApiFeedbackResponse {
+  feedback: Feedback[];
+  pagination: any;
+}
 interface publicApiResponse {
   data: Complaint[];
 }
@@ -648,11 +652,11 @@ export const adminApi = {
     }
   },
 
-  getPublicFeedback: async (token: string, lang?: string): Promise<Feedback[]> => {
+  getPublicFeedback: async (token: string, lang?: string): Promise<ApiFeedbackResponse> => {
     const response = await fetch(withLang(`${API_BASE_URL}/admin/public/feedback`, lang), {
       headers: getAuthHeaders(token),
     });
-    return handleResponse<Feedback[]>(response);
+    return handleDataResponse<ApiFeedbackResponse>(response);
   },
 
   // Get feedback filtered by subcity
