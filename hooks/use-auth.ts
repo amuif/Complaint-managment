@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api';
+import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 
 export function useAuth() {
   const { login, logout, token, user, isAuthenticated, setLoading, setError, error } =
@@ -22,7 +23,6 @@ export function useAuth() {
     onSuccess: (data) => {
       login(data.token, data.admin);
       setLoading(false);
-
       // Redirect based on role
       if (data.admin.role === 'SuperAdmin') {
         router.push('/superadmin');
@@ -45,9 +45,23 @@ export function useAuth() {
   });
 
   const createAdminMutation = useMutation({
+    mutationKey: ['create-admins'],
     mutationFn: async (formData: FormData) => {
       if (!token) throw new Error('Authentication required');
-      return adminApi.createAdmin(formData, token);
+      return await adminApi.createAdmin(formData, token);
+    },
+  });
+
+  const updateAdminMutation = useMutation({
+    mutationFn: async (formdata: FormData) => {
+      if (!token) throw new Error('Authentication required');
+      return await adminApi.updateAdmin(formdata, token);
+    },
+  });
+  const deleteAdminMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!token) throw new Error('Authentication required');
+      return await adminApi.deleteAdmin(id, token);
     },
   });
 
@@ -97,9 +111,11 @@ export function useAuth() {
 
     // Admin management (SuperAdmin only)
     getAdmins: getAdminMutation.data || [],
-    createAdmin: createAdminMutation.mutate,
+    createAdmin: createAdminMutation.mutateAsync,
+    updateAdmin: updateAdminMutation.mutateAsync,
     isCreatingAdmin: createAdminMutation.isPending,
     createAdminError: createAdminMutation.error,
+    deleteAdmin: deleteAdminMutation.mutateAsync || '',
 
     // Password reset
     requestPasswordReset: requestPasswordResetMutation.mutate,

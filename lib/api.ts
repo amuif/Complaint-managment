@@ -742,15 +742,42 @@ export const adminApi = {
   createAdmin: async (
     formData: FormData,
     token: string
-  ): Promise<{ message: string; admin: User }> => {
-    const response = await fetch(`${API_BASE_URL}/admin/admins`, {
+  ): Promise<{ message: string; admin?: User }> => {
+    const response = await fetch(`${API_BASE_URL}/admin`, {
       method: 'POST',
       headers: getMultipartHeaders(token),
       body: formData,
     });
+    return handleDataResponse<{ message: string; admin: User }>(response);
+  },
+  updateAdmin: async (formData: FormData, token: string) => {
+    const response = await fetch(`${API_BASE_URL}/admin`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
     return handleResponse<{ message: string; admin: User }>(response);
   },
-
+  deleteAdmin: async (id: string, token: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = handleResponse<{ message: string; admin: User }>(response);
+      return data;
+    } catch (error) {
+      console.log('error deleting admin', error);
+      handleApiError('Error deleting admin');
+      return { message: 'Error at deleting admin' };
+    }
+  },
   getAdmins: async (token: string): Promise<User[]> => {
     try {
       const response = await fetch(`${API_BASE_URL}/admin`, {
@@ -762,7 +789,8 @@ export const adminApi = {
       console.log('error at getting admins', error);
       return [];
     }
-  }, // Reports
+  },
+  // Reports
   exportReport: async (token: string, params?: any): Promise<Blob> => {
     const queryParams = new URLSearchParams();
     if (params) {

@@ -2,7 +2,7 @@
 
 import type React from 'react';
 
-import { useState, Suspense } from 'react';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -13,14 +13,12 @@ import {
   MessageSquare,
   Settings,
   LogOut,
-  Menu,
-  X,
   Bell,
   Search,
   Building2,
   Star,
+  UsersRound,
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -75,7 +73,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('allFeedback'), href: '/superadmin/feedback', icon: FileText },
     { name: t('allRatings'), href: '/superadmin/ratings', icon: Star },
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
-    { name: t('Admins'), href: '/superadmin/admins', icon: Building2 },
+    { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
     { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
   ];

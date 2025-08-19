@@ -20,12 +20,24 @@ import { EllipsisVertical, Plus } from 'lucide-react';
 import { User } from '@/types/user';
 import { UserEditDialog } from './admin-edit-dialog';
 import { UserCreateDialog } from './admin-create-dialog';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useAuth } from '@/hooks/use-auth';
+import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PICTURE_URL } from '@/constants/base_url';
 
 interface AdminTableProps {
   admins: User[];
 }
 const AdminTable = ({ admins }: AdminTableProps) => {
+  const { deleteAdmin } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [openDialog, setIsOpenDialog] = useState(false);
@@ -39,11 +51,17 @@ const AdminTable = ({ admins }: AdminTableProps) => {
     setSelectedUser(user);
     setIsOpenDialog(true);
   };
-  //
   const handleDelete = async () => {
-    // deleteSector(selectedSector?.id!);
-    // setIsOpenDialog(false);
-    // getSectors();
+    if (selectedUser) {
+      try {
+        const response = await deleteAdmin(selectedUser.id.toString());
+        handleApiSuccess(response.message);
+        setIsOpenDialog(false);
+      } catch (error) {
+        console.error(error);
+        handleApiError('Failed to delete admin');
+      }
+    }
   };
 
   useEffect(() => {
@@ -65,6 +83,7 @@ const AdminTable = ({ admins }: AdminTableProps) => {
             <TableHead>ID</TableHead>
             <TableHead>Admin Name</TableHead>
             <TableHead>Role</TableHead>
+            <TableHead>Phone number</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -72,8 +91,15 @@ const AdminTable = ({ admins }: AdminTableProps) => {
           {admins.map((admin, index) => (
             <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{admin.first_name + ' ' + admin.last_name}</TableCell>
+              <TableCell className="flex gap-2 items-center ">
+                <Avatar>
+                  <AvatarImage src={`${PICTURE_URL}${admin.profile_picture}`} />
+                  <AvatarFallback>{admin.first_name[0] + admin.last_name[0]}</AvatarFallback>
+                </Avatar>{' '}
+                {admin.first_name + ' ' + admin.last_name}
+              </TableCell>
               <TableCell>{admin.role}</TableCell>
+              <TableCell>{admin.phone || 'unassigned'}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger>
@@ -96,8 +122,7 @@ const AdminTable = ({ admins }: AdminTableProps) => {
       <UserEditDialog user={selectedUser} open={dialogOpen} onOpenChange={setDialogOpen} />
       {showCreateDialog && (
         <UserCreateDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
-
-       )} 
+      )}
 
       {openDialog && (
         <Dialog open={openDialog}>
@@ -105,8 +130,9 @@ const AdminTable = ({ admins }: AdminTableProps) => {
             <DialogHeader className="flex-col space-y-4">
               <DialogTitle>Are you absolutely sure?</DialogTitle>
               <DialogDescription>
-                This action cannot be undone. This will permanently delete {selectedUser?.first_name + ' '+ selectedUser?.last_name}{' '}
-                and remove sector data from our servers.
+                This action cannot be undone. This will permanently delete{' '}
+                {selectedUser?.first_name + ' ' + selectedUser?.last_name} and remove all of the
+                data from our servers.
               </DialogDescription>
             </DialogHeader>
 

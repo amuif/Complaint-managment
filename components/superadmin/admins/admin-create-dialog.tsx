@@ -1,8 +1,6 @@
 'use client';
 
 import type React from 'react';
-
-import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -22,34 +19,158 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { adminRoles } from '@/types/user';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { adminRoles, User } from '@/types/user';
+import { useAuth } from '@/hooks/use-auth';
+import { useOrganization } from '@/hooks/use-organization';
+import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useAuthStore } from '@/lib/auth-store';
+import { useEffect, useState } from 'react';
+
+const roleHierarchy = [
+  adminRoles.SuperAdmin,
+  adminRoles.SuperAdminSupporter,
+  adminRoles.Admin,
+  adminRoles.Editor,
+  adminRoles.Viewer,
+];
+
+const mapRoleToNumber = (role: string | undefined): adminRoles | undefined => {
+  switch (role) {
+    case 'SuperAdmin':
+      return adminRoles.SuperAdmin;
+    case 'SuperAdminSupporter':
+      return adminRoles.SuperAdminSupporter;
+    case 'Admin':
+      return adminRoles.Admin;
+    case 'Editor':
+      return adminRoles.Editor;
+    case 'Viewer':
+      return adminRoles.Viewer;
+    default:
+      console.warn('Unknown role:', role);
+      return undefined;
+  }
+};
+
+function getCreatableRoles(currentRole: adminRoles | string | undefined): adminRoles[] {
+  const roleNumber = typeof currentRole === 'string' ? mapRoleToNumber(currentRole) : currentRole;
+  if (!roleNumber && roleNumber !== 0) {
+    console.log('No valid role provided:', currentRole);
+    return [];
+  }
+  const index = roleHierarchy.indexOf(roleNumber as adminRoles);
+  if (index === -1) {
+    console.log('Invalid role:', roleNumber);
+    return [];
+  }
+  console.log('Creatable roles for', roleNumber, ':', roleHierarchy.slice(index + 1));
+  return roleHierarchy.slice(index + 1);
+}
+
+const userCreateSchema = z.object({
+  profile_picture: z.instanceof(File).optional().or(z.string().optional()),
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
+  username: z.string().min(1, 'Username is required'),
+  email: z.string().email('Invalid email').optional(),
+  phone: z.string().min(1, 'Phone is required'),
+  city: z.string().min(1, 'City is required'),
+  role: z.number(),
+  subcity_id: z.string().min(1, 'Subcity is required'),
+  sector_id: z.string().min(1, 'Sector is required'),
+  division_id: z.string().optional(),
+  department_id: z.string().optional(),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
+  failed_login_attempts: z.string().default('0'),
+});
+
+type UserCreateSchema = z.infer<typeof userCreateSchema>;
 
 interface UserCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function UserCreateDialog({ open, onOpenChange,}: UserCreateDialogProps) {
-  const [isActive, setIsActive] = useState(true);
-  const [role, setRole] = useState(adminRoles.Viewer.toString());
+export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) {
+  const { createAdmin } = useAuth();
+  const { user } = useAuthStore() as { user: User | undefined }; // Type assertion for user
+  const { Sectors, Directors, Teams, Subcities } = useOrganization();
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const [userError, setUserError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (user !== undefined) {
+      setIsUserLoading(false);
+      if (!user || !user.role) {
+        setUserError('Failed to load user role data');
+      } else {
+        console.log('User data:', { user, role: user.role, roleType: typeof user.role });
+      }
+    }
+  }, [user]);
 
-    const formData = new FormData(e.currentTarget);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm<UserCreateSchema>({
+    resolver: zodResolver(userCreateSchema),
+    defaultValues: {
+      role: adminRoles.Viewer,
+    },
+  });
 
-    // Add the switch and select values that aren't automatically included
-    formData.set('is_active', isActive.toString());
-    formData.set('role', role);
+  const profilePicture = watch('profile_picture');
+  const firstName = watch('first_name');
+  const lastName = watch('last_name');
 
+  const onSubmit = async (data: UserCreateSchema) => {
+    if (isUserLoading) {
+      handleApiError(new Error('User data is still loading. Please try again.'));
+      return;
+    }
+    if (!user || userError) {
+      handleApiError(new Error(userError || 'User data is not available.'));
+      return;
+    }
+
+    const creatableRoles = getCreatableRoles(user.role);
+    if (!creatableRoles.includes(data.role)) {
+      handleApiError(new Error('Cannot create user with a higher or equal role'));
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (key === 'role') {
+          formData.append(key, value.toString());
+        } else {
+          formData.append(key, value as any);
+        }
+      }
+    });
+
+    try {
+      const response = await createAdmin(formData);
+      handleApiSuccess('Admin created successfully');
+      handleOpenChange(false);
+    } catch (error) {
+      handleApiError(error);
+      console.error('Error at creating admin', error);
+    }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      // Reset form when closing
-      setIsActive(true);
-      setRole(adminRoles.Viewer.toString());
-    }
+    if (!newOpen) reset();
     onOpenChange(newOpen);
   };
 
@@ -60,136 +181,281 @@ export function UserCreateDialog({ open, onOpenChange,}: UserCreateDialogProps) 
           <DialogTitle>Create New Admin</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <Label>Profile Picture</Label>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage
+                      src={
+                        profilePicture instanceof File
+                          ? URL.createObjectURL(profilePicture)
+                          : undefined
+                      }
+                      alt="Profile preview"
+                    />
+                    <AvatarFallback className="text-lg">
+                      {firstName && lastName ? `${firstName[0]}${lastName[0]}` : 'NA'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setValue('profile_picture', file);
+                      }}
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="create_first_name">First Name</Label>
-                  <Input id="create_first_name" name="first_name" required />
+                  <Label>First Name</Label>
+                  <Input
+                    {...register('first_name')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.first_name && (
+                    <p className="text-sm text-red-500">{errors.first_name.message}</p>
+                  )}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="create_last_name">Last Name</Label>
-                  <Input id="create_last_name" name="last_name" required />
+                  <Label>Last Name</Label>
+                  <Input
+                    {...register('last_name')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.last_name && (
+                    <p className="text-sm text-red-500">{errors.last_name.message}</p>
+                  )}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="create_username">Username</Label>
-                  <Input id="create_username" name="username" required />
+                  <Label>Username</Label>
+                  <Input
+                    {...register('username')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.username && (
+                    <p className="text-sm text-red-500">{errors.username.message}</p>
+                  )}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="create_email">Email</Label>
-                  <Input id="create_email" name="email" type="email" required />
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    {...register('email')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="create_phone">Phone</Label>
-                  <Input id="create_phone" name="phone" />
+                  <Label>Phone</Label>
+                  <Input
+                    {...register('phone')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="create_city">City</Label>
-                  <Input id="create_city" name="city" />
+                  <Label>City</Label>
+                  <Input
+                    {...register('city')}
+                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Role & Status */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Role & Status</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="create_role">Role</Label>
-                  <Select value={role} onValueChange={setRole}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={adminRoles.SuperAdmin.toString()}>Super Admin</SelectItem>
-                      <SelectItem value={adminRoles.SuperAdminSupporter.toString()}>
-                        Super Admin Supporter
-                      </SelectItem>
-                      <SelectItem value={adminRoles.Admin.toString()}>Admin</SelectItem>
-                      <SelectItem value={adminRoles.Editor.toString()}>Editor</SelectItem>
-                      <SelectItem value={adminRoles.Viewer.toString()}>Viewer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create_is_active">Account Status</Label>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="create_is_active"
-                      checked={isActive}
-                      onCheckedChange={setIsActive}
-                    />
-                    <Label htmlFor="create_is_active" className="text-sm">
-                      {isActive ? 'Active' : 'Inactive'}
-                    </Label>
-                  </div>
-                </div>
+            <CardContent>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                {isUserLoading ? (
+                  <p className="text-sm text-gray-500">Loading user data...</p>
+                ) : userError ? (
+                  <p className="text-sm text-red-500">{userError}</p>
+                ) : (
+                  <Controller
+                    name="role"
+                    control={control}
+                    render={({ field }) => {
+                      const creatableRoles = getCreatableRoles(user?.role);
+                      if (creatableRoles.length === 0) {
+                        return (
+                          <p className="text-sm text-red-500">
+                            You do not have permission to create admins.
+                          </p>
+                        );
+                      }
+                      return (
+                        <Select
+                          value={field.value?.toString()}
+                          onValueChange={(value) => field.onChange(Number(value))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {creatableRoles.map((role) => (
+                              <SelectItem key={role} value={role.toString()}>
+                                {role === adminRoles.SuperAdmin
+                                  ? 'Super Admin'
+                                  : role === adminRoles.SuperAdminSupporter
+                                    ? 'Super Admin Supporter'
+                                    : role === adminRoles.Admin
+                                      ? 'Admin'
+                                      : role === adminRoles.Editor
+                                        ? 'Editor'
+                                        : 'Viewer'}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      );
+                    }}
+                  />
+                )}
+                {errors.role && <p className="text-sm text-red-500">{errors.role.message}</p>}
               </div>
             </CardContent>
           </Card>
 
-          {/* Organization Information */}
+          {/* Organization */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Organization</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="create_subcity_id">Subcity ID</Label>
-                  <Input id="create_subcity_id" name="subcity_id" type="number" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create_department_id">Department ID</Label>
-                  <Input id="create_department_id" name="department_id" type="number" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create_sector_id">Sector ID</Label>
-                  <Input id="create_sector_id" name="sector_id" type="number" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="create_division_id">Division ID</Label>
-                  <Input id="create_division_id" name="division_id" type="number" />
-                </div>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Controller
+                  name="subcity_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Subcities" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Subcities.map((s) => (
+                          <SelectItem key={s.id} value={s.id.toString()}>
+                            {s.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.subcity_id && (
+                  <p className="text-sm text-red-500">{errors.subcity_id.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Controller
+                  name="sector_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sectors" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Sectors.map((s) => (
+                          <SelectItem key={s.id} value={s.id.toString()}>
+                            {s.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.sector_id && (
+                  <p className="text-sm text-red-500">{errors.sector_id.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Controller
+                  name="division_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Directors" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Directors.map((d) => (
+                          <SelectItem key={d.id} value={d.id.toString()}>
+                            {d.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.division_id && (
+                  <p className="text-sm text-red-500">{errors.division_id.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Controller
+                  name="department_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Teams" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Teams.map((t) => (
+                          <SelectItem key={t.id} value={t.id.toString()}>
+                            {t.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.department_id && (
+                  <p className="text-sm text-red-500">{errors.department_id.message}</p>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Security Settings */}
+          {/* Security */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Security Settings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="create_password">Password</Label>
-                <Input
-                  id="create_password"
-                  name="password"
-                  type="password"
-                  required
-                  placeholder="Enter password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="create_failed_login_attempts">Failed Login Attempts</Label>
-                <Input
-                  id="create_failed_login_attempts"
-                  name="failed_login_attempts"
-                  type="number"
-                  defaultValue="0"
-                  min="0"
-                />
-              </div>
+            <CardContent>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                {...register('password')}
+                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </CardContent>
           </Card>
 
@@ -197,7 +463,9 @@ export function UserCreateDialog({ open, onOpenChange,}: UserCreateDialogProps) 
             <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create Admin</Button>
+            <Button type="submit" disabled={isUserLoading || !!userError}>
+              Create Admin
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
