@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, Clock, MessageSquare } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { useComplaints } from '@/hooks/use-complaints';
 
 export function ComplaintStats() {
   const [stats, setStats] = useState({
@@ -13,24 +14,18 @@ export function ComplaintStats() {
     total: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { publicComplaints } = useComplaints();
+  useEffect(() => {
+    console.log(publicComplaints);
+  }, [publicComplaints]);
 
   useEffect(() => {
     // Fetch complaint statistics
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/complaint-stats');
-        const data = await response.json();
-        setStats(data);
       } catch (error) {
         console.error('Error fetching complaint stats:', error);
-        // Fallback stats if API fails
-        setStats({
-          open: 2,
-          inProgress: 2,
-          resolved: 2,
-          total: 6,
-        });
       } finally {
         setLoading(false);
       }

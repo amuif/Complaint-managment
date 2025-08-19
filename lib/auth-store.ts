@@ -1,5 +1,5 @@
 import { Subcities } from '@/types/subcities';
-import { User } from '@/types/user';
+import { adminRoles, User } from '@/types/user';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -20,7 +20,6 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => {
-      // Initialize from localStorage if available
       const initializeFromStorage = () => {
         try {
           const token = localStorage.getItem('token');
@@ -83,19 +82,23 @@ export const useAuthStore = create<AuthState>()(
 
 // Helper functions for auth
 export const isAdmin = (user: User | null): boolean => {
-  return user?.role === 'SuperAdmin' || user?.role === 'SubCityAdmin' || user?.role === 'Admin';
+  return (
+    user?.role === adminRoles.SuperAdmin ||
+    user?.role === adminRoles.SuperAdminSupporter ||
+    user?.role === adminRoles.Admin
+  );
 };
 
 export const isSuperAdmin = (user: User | null): boolean => {
-  return user?.role === 'SuperAdmin';
+  return user?.role === adminRoles.SuperAdmin;
 };
 
 export const isSubCityAdmin = (user: User | null): boolean => {
-  return user?.role === 'SubCityAdmin';
+  return user?.role === adminRoles.SuperAdminSupporter;
 };
 
 export const isDepartmentAdmin = (user: User | null): boolean => {
-  return user?.role === 'Admin';
+  return user?.role === adminRoles.Admin;
 };
 
 // export const hasAccessToSection = (user: User | null, section: string): boolean => {
@@ -104,13 +107,13 @@ export const isDepartmentAdmin = (user: User | null): boolean => {
 //   if (user.role === 'SubCityAdmin') return user.subcity === subcity.name_en;
 //   return user.section === section || user.section === 'all';
 // };
-
-export const hasAccessToDepartment = (user: User | null, department: string): boolean => {
-  if (!user) return false;
-  if (user.role === 'SuperAdmin') return true;
-  // if (user.role === 'Admin') return user.department === department;
-  return false;
-};
+//
+// export const hasAccessToDepartment = (user: User | null, department: string): boolean => {
+//   if (!user) return false;
+//   if (user.role === 'SuperAdmin') return true;
+//   // if (user.role === 'Admin') return user.department === department;
+//   return false;
+// };
 
 // export const hasAccessToSubcity = (user: User | null, subcity: string): boolean => {
 //   if (!user) return false;

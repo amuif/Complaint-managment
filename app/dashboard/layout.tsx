@@ -38,6 +38,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { PageLoader } from '@/components/ui/loader';
+import { adminRoles } from '@/types/user';
+import { PICTURE_URL } from '@/constants/base_url';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
@@ -60,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       { name: t('statistics'), href: '/dashboard/analytics', icon: BarChart3 },
     ];
 
-    if (user?.role === 'SuperAdmin') {
+    if (user?.role === adminRoles.SuperAdmin) {
       baseNavigation.push(
         { name: t('administration'), href: '/dashboard/admin', icon: Shield },
         {
@@ -99,11 +101,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const getRoleDisplay = () => {
     if (!user) return '';
     switch (user.role) {
-      case 'SuperAdmin':
+      case adminRoles.SuperAdmin:
         return t('superAdmin');
-      case 'SubCityAdmin':
+      case adminRoles.SuperAdminSupporter:
         return t('subCityAdmin');
-      case 'Admin':
+      case adminRoles.Admin:
         return t('departmentAdmin');
       default:
         return user.role;
@@ -113,7 +115,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const getLocationDisplay = () => {
     if (!user) return '';
     if (user.subcity) {
-      return `${user.subcity}, ${user.city || 'Addis Ababa'}`;
+      return `${user.subcity.name_en}, ${user.city || 'Addis Ababa'}`;
     }
     if (user.department) {
       return user.department;
@@ -123,7 +125,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen flex-col bg-blue-50 dark:bg-blue-950">
-      {/* Mobile header */}
       <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-white dark:bg-blue-900 px-4 sm:static md:hidden">
         <Button
           variant="outline"
@@ -142,7 +143,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      {/* Mobile sidebar */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-white dark:bg-blue-900 md:hidden">
           <div className="flex h-16 items-center justify-between border-b px-4">
@@ -227,7 +227,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={user?.profilePicture} alt={getUserDisplayName()} />
+                  <AvatarImage
+                    src={`${PICTURE_URL}${user?.profile_picture}`}
+                    alt={getUserDisplayName()}
+                  />
                   <AvatarFallback className="bg-blue-600 text-white">
                     {getUserInitials()}
                   </AvatarFallback>
@@ -241,7 +244,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </p>
                   {getLocationDisplay() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {getLocationDisplay()}
+                      {user?.subcity?.name_en || user?.department?.name_en}
                     </p>
                   )}
                 </div>
@@ -303,18 +306,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative rounded-lg">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
-                <span className="sr-only">{t('notifications')}</span>
-              </Button>
-              <LanguageToggle />
+              {/* <Button variant="ghost" size="icon" className="relative rounded-lg"> */}
+              {/*   <Bell className="h-5 w-5" /> */}
+              {/*   <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span> */}
+              {/*   <span className="sr-only">{t('notifications')}</span> */}
+              {/* </Button> */}
+              {/* <LanguageToggle /> */}
               <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.profilePicture} alt={getUserDisplayName()} />
+                      <AvatarImage
+                        src={`${PICTURE_URL}${user?.profile_picture}`}
+                        alt={getUserDisplayName()}
+                      />
                       <AvatarFallback className="bg-blue-600 text-white">
                         {getUserInitials()}
                       </AvatarFallback>
@@ -330,7 +336,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </p>
                       {getLocationDisplay() && (
                         <p className="text-xs leading-none text-muted-foreground">
-                          {getLocationDisplay()}
+                          {user?.subcity?.name_en || user?.department?.name_en}
                         </p>
                       )}
                     </div>

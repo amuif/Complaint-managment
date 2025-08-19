@@ -1,36 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/components/language-provider';
 import { useStatistics } from '@/hooks/use-statistics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Users,
   MessageSquare,
   FileText,
   Star,
   TrendingUp,
-  TrendingDown,
-  Clock,
   CheckCircle,
   AlertTriangle,
   BarChart3,
   Calendar,
-  MapPin,
-  Building,
-  Shield,
   Loader2,
 } from 'lucide-react';
+import { adminRoles } from '@/types/user';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { statistics, isLoading, isError, error } = useStatistics();
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  useEffect(() => {
+    console.log(statistics);
+  }, [statistics]);
 
   const getWelcomeMessage = () => {
     const hour = new Date().getHours();
@@ -78,23 +79,6 @@ export default function DashboardPage() {
         <p className="text-gray-600 dark:text-gray-400">
           {t('welcomeBack')} Here's what's happening in your office today.
         </p>
-
-        {/* User Role & Location Info */}
-        <div className="flex items-center gap-4 mt-4">
-          <Badge variant="secondary" className="flex items-center gap-2">
-            <Shield className="h-3 w-3" />
-            {user?.role === 'SuperAdmin' && t('superAdmin')}
-            {user?.role === 'SubCityAdmin' && t('subCityAdmin')}
-            {user?.role === 'Admin' && t('departmentAdmin')}
-            {!user?.role && 'Admin'}
-          </Badge>
-          {(user?.subcity || user?.department) && (
-            <Badge variant="outline" className="flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              {user?.subcity ? `${user.subcity}, ${user.city || 'Addis Ababa'}` : user?.department}
-            </Badge>
-          )}
-        </div>
       </div>
 
       {/* Quick Stats */}

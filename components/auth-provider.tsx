@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth-store';
+import { adminRoles } from '@/types/user';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -30,11 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initialize();
   }, [initialize]);
 
-  const isSuperAdmin = user?.role === 'SuperAdmin';
-  const isSubCityAdmin = user?.role === 'SubCityAdmin';
-  const userSection = user?.section || null;
+  const isSuperAdmin = user?.role === adminRoles.SuperAdmin;
+  const isSubCityAdmin = user?.role === adminRoles.Admin;
+  const userSection = user?.subcity?.name_en || null;
 
-  // Route protection logic
   useEffect(() => {
     // Skip for public routes
     if (
@@ -47,11 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pathname === '/complaints'
     ) {
       return;
-    }
-
-    // Redirect to login if not authenticated
-    if (!isLoading && !isAuthenticated && pathname.includes('/dashboard')) {
-      router.push('/login');
     }
 
     // Redirect to dashboard if authenticated but trying to access login/signup

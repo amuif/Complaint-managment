@@ -5,6 +5,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
+import { adminRoles } from '@/types/user';
 
 export function useAuth() {
   const { login, logout, token, user, isAuthenticated, setLoading, setError, error } =
@@ -24,7 +25,10 @@ export function useAuth() {
       login(data.token, data.admin);
       setLoading(false);
       // Redirect based on role
-      if (data.admin.role === 'SuperAdmin') {
+      if (
+        data.admin.role === adminRoles.SuperAdmin ||
+        data.admin.role === adminRoles.SuperAdminSupporter
+      ) {
         router.push('/superadmin');
       } else {
         router.push('/dashboard');
