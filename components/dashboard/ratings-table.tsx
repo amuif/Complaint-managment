@@ -5,9 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Star, Award } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isWithinInterval } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
-export function RatingsTable() {
+interface RatingsTableProps {
+  searchQuery: string;
+  dateRange: DateRange | undefined;
+}
+
+export function RatingsTable({ searchQuery, dateRange }: RatingsTableProps) {
   const { ratings, publicRatings, isLoading, isError } = useRatings();
 
   if (isLoading) {
@@ -57,8 +63,54 @@ export function RatingsTable() {
     );
   }
 
-  // Combine both rating sources and sort by date
-  const allRatings = [...(ratings || []), ...(publicRatings || [])]
+  // Combine both rating sources
+  const allRatings = [...(ratings || []), ...(publicRatings || [])];
+
+  // Filter ratings based on searchQuery and dateRange
+  const filteredRatings = allRatings
+    .filter((rating) => {
+      // Search filter: Match phone_number or employee_name
+      const searchLower = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !searchQuery ||
+        rating.phone_number?.toLowerCase().includes(searchLower) ||
+        rating.Employee?.first_name_en?.toLowerCase().includes(searchLower);
+
+      // Date range filter
+      let matchesDate = true;
+      if (dateRange?.from && dateRange?.to) {
+        try {
+          const ratingDate = parseISO(rating.created_at);
+          matchesDate = isWithinInterval(ratingDate, {
+            start: dateRange.from,
+            end: dateRange.to,
+          });
+        } catch (error) {
+          console.error('Invalid date format for rating:', rating.created_at);
+          matchesDate = false;
+        }
+      } else if (dateRange?.from) {
+        // If only "from" date is provided, filter ratings on or after that date
+        try {
+          const ratingDate = parseISO(rating.created_at);
+          matchesDate = ratingDate >= dateRange.from;
+        } catch (error) {
+          console.error('Invalid date format for rating:', rating.created_at);
+          matchesDate = false;
+        }
+      } else if (dateRange?.to) {
+        // If only "to" date is provided, filter ratings on or before that date
+        try {
+          const ratingDate = parseISO(rating.created_at);
+          matchesDate = ratingDate <= dateRange.to;
+        } catch (error) {
+          console.error('Invalid date format for rating:', rating.created_at);
+          matchesDate = false;
+        }
+      }
+
+      return matchesSearch && matchesDate;
+    })
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10); // Show only the 10 most recent
 
@@ -71,8 +123,8 @@ export function RatingsTable() {
     ));
   };
 
-  const getAverageRating = (courtesy: number, timeliness: number, knowledge: number) => {
-    return ((courtesy + timeliness + knowledge) / 3).toFixed(1);
+  const getAverageRating = (courtesy: number, punctuality: number, knowledge: number) => {
+    return ((courtesy + punctuality + knowledge) / 3).toFixed(1);
   };
 
   const getAverageRatingBadge = (courtesy: number, timeliness: number, knowledge: number) => {
@@ -107,8 +159,10 @@ export function RatingsTable() {
         <CardDescription>Latest service ratings from customers</CardDescription>
       </CardHeader>
       <CardContent>
-        {allRatings.length === 0 ? (
-          <p className="text-muted-foreground text-center py-4">No ratings available</p>
+        {filteredRatings.length === 0 ? (
+          <p className="text-muted-foreground text-center py-4">
+            No ratings match the current filters
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-muted text-sm">
@@ -118,13 +172,13 @@ export function RatingsTable() {
                     Contact
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">
-                    Employee
+                    Director
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">
                     Courtesy
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">
-                    Timeliness
+                    Punctuality
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">
                     Knowledge
@@ -138,7 +192,7 @@ export function RatingsTable() {
                 </tr>
               </thead>
               <tbody>
-                {allRatings.map((rating, idx) => (
+                {filteredRatings.map((rating, idx) => (
                   <tr
                     key={rating.id}
                     className={`border-b last:border-0 transition-colors ${
@@ -147,15 +201,11 @@ export function RatingsTable() {
                   >
                     <td className="px-3 py-2 font-medium flex items-center gap-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs">
-                          {rating.phone_number ? rating.phone_number.slice(-2) : '??'}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-xs">{rating.full_name[0]}</AvatarFallback>
                       </Avatar>
-                      <span className="text-xs">{rating.phone_number}</span>
+                      <span className="text-xs">{rating.full_name}</span>
                     </td>
-                    <td className="px-3 py-2 text-xs">
-                      {rating.Employee?.employee_name || 'Unknown'}
-                    </td>
+                    <td className="px-3 py-2 text-xs">{rating.division?.name_en || 'Unknown'}</td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1">
                         {getRatingStars(rating.courtesy)}
@@ -164,8 +214,8 @@ export function RatingsTable() {
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1">
-                        {getRatingStars(rating.timeliness)}
-                        <span className="text-xs ml-1">({rating.timeliness})</span>
+                        {getRatingStars(rating.punctuality)}
+                        <span className="text-xs ml-1">({rating.punctuality})</span>
                       </div>
                     </td>
                     <td className="px-3 py-2">
@@ -175,7 +225,7 @@ export function RatingsTable() {
                       </div>
                     </td>
                     <td className="px-3 py-2">
-                      {getAverageRatingBadge(rating.courtesy, rating.timeliness, rating.knowledge)}
+                      {getAverageRatingBadge(rating.courtesy, rating.punctuality, rating.knowledge)}
                     </td>
                     <td className="px-3 py-2 text-xs text-muted-foreground">
                       {format(parseISO(rating.created_at), 'MMM dd')}

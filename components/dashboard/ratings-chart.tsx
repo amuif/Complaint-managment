@@ -4,8 +4,12 @@ import { useRatings } from '@/hooks/use-ratings';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
 
-export function RatingsChart() {
+interface RatingsChartProps {
+  dateRange: DateRange | undefined;
+}
+export function RatingsChart({ dateRange }: RatingsChartProps) {
   const { ratings, publicRatings, isLoading, isError } = useRatings();
 
   if (isLoading) {
@@ -72,7 +76,7 @@ export function RatingsChart() {
   }
 
   // Calculate averages for each category
-  const calculateAverage = (category: 'courtesy' | 'timeliness' | 'knowledge') => {
+  const calculateAverage = (category: 'courtesy' | 'punctuality' | 'knowledge') => {
     const sum = allRatings.reduce((acc, rating) => acc + (rating[category] || 0), 0);
     return Number((sum / allRatings.length).toFixed(1));
   };
@@ -85,9 +89,9 @@ export function RatingsChart() {
       count: allRatings.filter((r) => r.courtesy).length,
     },
     {
-      category: 'Timeliness',
-      average: calculateAverage('timeliness'),
-      count: allRatings.filter((r) => r.timeliness).length,
+      category: 'Punctuality',
+      average: calculateAverage('punctuality'),
+      count: allRatings.filter((r) => r.punctuality).length,
     },
     {
       category: 'Knowledge',
