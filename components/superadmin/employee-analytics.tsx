@@ -12,42 +12,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
-// Mock data - would be replaced with API data
-const departmentData = [
-  { name: 'HR', employees: 42, rating: 4.2 },
-  { name: 'Finance', employees: 38, rating: 4.5 },
-  { name: 'Operations', employees: 65, rating: 4.1 },
-  { name: 'IT', employees: 27, rating: 4.7 },
-  { name: 'Customer Service', employees: 63, rating: 4.3 },
-  { name: 'Administration', employees: 48, rating: 4.0 },
-  { name: 'Legal', employees: 22, rating: 4.4 },
-  { name: 'Communications', employees: 18, rating: 4.6 },
-  { name: 'Regional Affairs', employees: 35, rating: 4.2 },
-];
-
-const regionData = [
-  { name: 'Addis Ababa', employees: 120, rating: 4.4 },
-  { name: 'Amhara', employees: 85, rating: 4.2 },
-  { name: 'Oromia', employees: 95, rating: 4.3 },
-  { name: 'Tigray', employees: 45, rating: 4.1 },
-  { name: 'SNNPR', employees: 65, rating: 4.5 },
-  { name: 'Sidama', employees: 35, rating: 4.2 },
-  { name: 'Somali', employees: 30, rating: 4.0 },
-  { name: 'Afar', employees: 25, rating: 3.9 },
-  { name: 'Gambella', employees: 20, rating: 4.0 },
-  { name: 'Benishangul-Gumuz', employees: 28, rating: 4.1 },
-  { name: 'Harari', employees: 18, rating: 4.3 },
-  { name: 'Dire Dawa', employees: 22, rating: 4.4 },
-];
-
-const ratingDistribution = [
-  { rating: '5 Stars', count: 120 },
-  { rating: '4 Stars', count: 230 },
-  { rating: '3 Stars', count: 85 },
-  { rating: '2 Stars', count: 25 },
-  { rating: '1 Star', count: 10 },
-];
+import { useEmployees } from '@/hooks/use-employees';
+import { useEffect, useState } from 'react';
 
 interface EmployeeAnalyticsProps {
   regionFilter: string;
@@ -56,6 +22,59 @@ interface EmployeeAnalyticsProps {
 
 export function EmployeeAnalytics({ regionFilter, departmentFilter }: EmployeeAnalyticsProps) {
   const { t } = useLanguage();
+  const { employees } = useEmployees();
+
+  const [departmentData, setDepartmentData] = useState<{ name: string; employees: number }[]>([]);
+  const [regionData, setRegionData] = useState<{ name: string; employees: number }[]>([]);
+
+  useEffect(() => {
+    console.log('Employees:', employees);
+    console.log('Filters:', { departmentFilter, regionFilter });
+
+    if (!employees || employees.length === 0) {
+      console.log('No employees data available');
+      return;
+    }
+
+    const deptCount = {};
+    employees.forEach((emp) => {
+      const deptName = emp.department?.name_en || 'Unknown';
+      if (!departmentFilter || deptName === departmentFilter) {
+        deptCount[deptName] = (deptCount[deptName] || 0) + 1;
+      }
+    });
+    const deptDataArray = Object.entries(deptCount).map(([name, count]) => ({
+      name,
+      employees: count,
+    }));
+    console.log('deptCount:', deptCount);
+    console.log('deptDataArray:', deptDataArray);
+
+    const regionCount = {};
+    employees.forEach((emp) => {
+      const regionName = emp.subcity?.name_en || 'Unknown';
+      if (!regionFilter || regionName === regionFilter) {
+        regionCount[regionName] = (regionCount[regionName] || 0) + 1;
+      }
+    });
+    const regionDataArray = Object.entries(regionCount).map(([name, count]) => ({
+      name,
+      employees: count,
+    }));
+    console.log('regionCount:', regionCount);
+    console.log('regionDataArray:', regionDataArray);
+
+    setDepartmentData(deptDataArray);
+    setRegionData(regionDataArray);
+  }, [employees, departmentFilter, regionFilter]);
+  useEffect(() => {
+    console.log(employees);
+  }, [employees]);
+
+  useEffect(() => {
+    console.log(departmentData);
+    console.log(regionData);
+  }, [departmentData, regionData]);
 
   return (
     <div className="space-y-6">
@@ -102,27 +121,6 @@ export function EmployeeAnalytics({ regionFilter, departmentFilter }: EmployeeAn
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('employeeRatingDistribution')}</CardTitle>
-          <CardDescription>{t('employeeRatingDistributionDesc')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ratingDistribution}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="rating" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="count" name={t('employees')} fill="#f59e0b" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

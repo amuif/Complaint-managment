@@ -1033,7 +1033,7 @@ export const complaintsApi = {
 export const employeesApi = {
   getEmployees: async () => {
     const endpoint = `/admin/employees`;
-    const response = await apiRequest(endpoint);
+    const response: Employee[] = await apiRequest(endpoint);
     return response;
   },
 
