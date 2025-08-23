@@ -1,5 +1,7 @@
+import AllAdminEmployeesPage from "./employeePage";
+
 const page = () => {
-  return <div> employees page</div>;
+  return <div><AllAdminEmployeesPage/></div>;
 };
 
 export default page;

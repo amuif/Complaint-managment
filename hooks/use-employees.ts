@@ -11,10 +11,9 @@ export function useEmployees() {
   // Get all employees
   const employeesQuery = useQuery({
     queryKey: ['get-employees'],
-    queryFn: ({ queryKey }) => {
+    queryFn: () => {
       if (!token) throw new Error('Authentication required');
-      const [, filters] = queryKey as [string, EmployeeFiltersTypes];
-      return employeesApi.getEmployees(filters);
+      return employeesApi.getEmployees();
     },
   });
 

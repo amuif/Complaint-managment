@@ -1031,15 +1031,9 @@ export const complaintsApi = {
 
 // Employees API - Fixed field mapping
 export const employeesApi = {
-  getEmployees: async (filters?: EmployeeFiltersTypes) => {
-    const params = new URLSearchParams();
-    if (filters?.city) params.append('city', filters.city);
-    if (filters?.subcity) params.append('subcity', filters.subcity);
-    if (filters?.department) params.append('department', filters.department);
-
-    const endpoint = `/admin/employees${params.toString() ? `?${params.toString()}` : ''}`;
+  getEmployees: async () => {
+    const endpoint = `/admin/employees`;
     const response = await apiRequest(endpoint);
-
     return response;
   },
 
