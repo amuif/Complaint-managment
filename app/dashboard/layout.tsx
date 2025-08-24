@@ -59,7 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       },
       { name: t('allFeedback'), href: '/dashboard/feedback', icon: FileText },
       { name: t('allRatings'), href: '/dashboard/ratings', icon: Star },
-      { name: t('statistics'), href: '/dashboard/analytics', icon: BarChart3 },
+      { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     ];
 
     if (user?.role === adminRoles.SuperAdmin) {

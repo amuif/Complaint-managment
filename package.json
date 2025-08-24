@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build-dev":"next build",
     "postbuild": "cp -r .next/static .next/standalone/.next/static || true",
     "start": "next start",
     "lint": "next lint",

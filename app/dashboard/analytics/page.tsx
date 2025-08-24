@@ -6,16 +6,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import type { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BarChart, LineChart, PieChart } from '@/components/ui/charts';
+import { useComplaints } from '@/hooks/use-complaints';
+import { useFeedback } from '@/hooks/use-feedback';
+import { useRatings } from '@/hooks/use-ratings';
 
 export default function AnalyticsPage() {
   const { t } = useLanguage();
+  const [resolvedComplaints, setResolvedComplaints] = useState<number>(0);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const { publicComplaints } = useComplaints();
+  const { publicFeedback } = useFeedback();
+  const { ratings } = useRatings();
+
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: addDays(new Date(), -30),
     to: new Date(),
   });
+  useEffect(() => {
+    const resolved = publicComplaints.filter((complaint) => complaint.status === 'resolved').length;
+    setResolvedComplaints(resolved);
+  }, [publicComplaints]);
+  useEffect(() => {
+    if (!ratings || ratings.length === 0) return;
 
+    const total = ratings.reduce((sum, rating) => sum + Number(rating.overall_rating || 0), 0);
+    const average = total / ratings.length;
+
+    console.log('Average rating:', average);
+  }, [ratings]);
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
@@ -24,7 +44,7 @@ export default function AnalyticsPage() {
           <p className="text-muted-foreground">{t('viewAnalytics')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          <DatePickerWithRange date={dateRange} onDateChange={setDateRange} />
         </div>
       </div>
 
@@ -42,8 +62,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm font-medium">{t('totalComplaints')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,345</div>
-                <p className="text-xs text-muted-foreground">+12.5% {t('fromLastMonth')}</p>
+                <div className="text-2xl font-bold">{publicComplaints.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -51,8 +70,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm font-medium">{t('totalFeedback')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">1,876</div>
-                <p className="text-xs text-muted-foreground">+5.2% {t('fromLastMonth')}</p>
+                <div className="text-2xl font-bold">{publicFeedback?.feedback.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -60,17 +78,15 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm font-medium">{t('averageRating')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">4.2</div>
-                <p className="text-xs text-muted-foreground">+0.3 {t('fromLastMonth')}</p>
+                <div className="text-2xl font-bold">{averageRating}</div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">{t('resolvedComplaints')}</CardTitle>
+                <CardTitle className="text-sm font-medium">Resolved complaints</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">89%</div>
-                <p className="text-xs text-muted-foreground">+2.1% {t('fromLastMonth')}</p>
+                <div className="text-2xl font-bold">{resolvedComplaints}</div>
               </CardContent>
             </Card>
           </div>
