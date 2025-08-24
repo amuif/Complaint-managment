@@ -81,7 +81,7 @@ export function PieChart({ data, nameKey, dataKey, height = 400 }: PieChartProps
           ))}
         </Pie>
         <Tooltip />
-        <Legend />
+        <Legend wrapperStyle={{ marginTop: 20 }}/>
       </RechartsPieChart>
     </ResponsiveContainer>
   );
