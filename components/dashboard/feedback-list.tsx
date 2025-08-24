@@ -7,9 +7,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Star, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useEffect } from 'react';
+import { DateRange } from 'react-day-picker';
 
-export function FeedbackList() {
+interface FeedbackTableProps {
+  searchQuery: string;
+  dateRange: DateRange | undefined;
+  type: 'positive' | 'all' | 'negative' | 'neutral';
+}
+
+export function FeedbackList({ searchQuery, dateRange, type }: FeedbackTableProps) {
   const { feedback, publicFeedback, isLoading, isError } = useFeedback();
+
   useEffect(() => {
     if (publicFeedback) {
       console.log(publicFeedback.feedback);
@@ -63,21 +71,46 @@ export function FeedbackList() {
     );
   }
 
-  const allFeedback = [...(feedback || []), ...(publicFeedback?.feedback || [])]
+  const allFeedback = [...(publicFeedback?.feedback || [])]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 5); // Show only the 5 most recent
-  //
+    .slice(0, 5);
+
+  // Apply filtering
+  const filteredFeedback = allFeedback.filter((item) => {
+    // Search query filter
+    const matchesSearch =
+      searchQuery === '' ||
+      item.feedback_text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.employee &&
+        `${item.employee.first_name_en} ${item.employee.last_name_en}`
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()));
+
+    // Date range filter
+    let matchesDate = true;
+    if (dateRange?.from && dateRange?.to) {
+      const createdAt = new Date(item.created_at);
+      matchesDate = createdAt >= dateRange.from && createdAt <= dateRange.to;
+    }
+
+    // Type filter
+    let matchesType = true;
+    const satisfaction = item.overall_satisfaction ? Number(item.overall_satisfaction) : null;
+
+    if (type === 'positive') matchesType = satisfaction !== null && satisfaction >= 4;
+    else if (type === 'neutral') matchesType = satisfaction === 3;
+    else if (type === 'negative') matchesType = satisfaction !== null && satisfaction <= 2;
+    return matchesSearch && matchesDate && matchesType;
+  });
+
   const getRatingStars = (rating: number | null) => {
     if (!rating) return null;
-
     return (
       <div className="flex items-center gap-1">
         {Array.from({ length: 5 }, (_, i) => (
           <Star
             key={i}
-            className={`w-3 h-3 ${
-              i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            }`}
+            className={`w-3 h-3 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
           />
         ))}
         <span className="text-xs text-muted-foreground ml-1">({rating})</span>
@@ -87,16 +120,10 @@ export function FeedbackList() {
 
   const getRatingBadge = (rating: number | null) => {
     if (!rating) return null;
-
     let className = '';
-    if (rating >= 4) {
-      className = 'bg-green-100 text-green-700 border-green-200';
-    } else if (rating >= 3) {
-      className = 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    } else {
-      className = 'bg-red-100 text-red-700 border-red-200';
-    }
-
+    if (rating >= 4) className = 'bg-green-100 text-green-700 border-green-200';
+    else if (rating >= 3) className = 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    else className = 'bg-red-100 text-red-700 border-red-200';
     return (
       <Badge variant="outline" className={className}>
         {rating} stars
@@ -115,12 +142,12 @@ export function FeedbackList() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {allFeedback.length === 0 ? (
+          {filteredFeedback.length === 0 ? (
             <p className="text-muted-foreground text-center py-4">No feedback available</p>
           ) : (
-            allFeedback.map((item) => (
+            filteredFeedback.map((item, index) => (
               <div
-                key={item.id}
+                key={index}
                 className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0"
               >
                 <Avatar className="h-8 w-8">
@@ -129,24 +156,20 @@ export function FeedbackList() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-muted-foreground">
-                      {format(parseISO(item.created_at), 'MMM dd')}
-                    </span>
+                  <div className="flex justify-start gap-4 items-center">
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                      {item.full_name}
+                    </p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-muted-foreground">
+                        {format(parseISO(item.created_at), 'MMM dd')}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                     {item.feedback_text}
                   </p>
-
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>Subcity: {item.subcity.name_en}</span>
-                    {item.employee && (
-                      <span>
-                        • Employee: {item.employee.first_name_en} {item.employee.last_name_en}
-                      </span>
-                    )}
-                  </div>
                 </div>
               </div>
             ))

@@ -26,7 +26,7 @@ export default function FeedbackPage() {
           <p className="text-muted-foreground">{t('manageFeedback')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          <DatePickerWithRange date={dateRange} onDateChange={setDateRange} />
           <div className="relative">
             <Input
               placeholder={t('searchFeedback')}
@@ -52,7 +52,7 @@ export default function FeedbackPage() {
               <CardDescription>{t('viewAllFeedback')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <FeedbackList />
+              <FeedbackList searchQuery={searchQuery} dateRange={dateRange} type="all" />
             </CardContent>
           </Card>
         </TabsContent>
