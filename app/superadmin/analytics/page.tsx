@@ -325,7 +325,14 @@ export default function SuperAdminAnalyticsPage() {
                       name: 'Admin',
                       value: getAdmins.filter((admin) => admin.role === 'Admin').length || 0,
                     },
-                    { name: t('employees') || 'Employees', value: filteredEmployees.length || 0 },
+                    {
+                      name: 'Editor',
+                      value: getAdmins.filter((admin) => admin.role === 'Editor').length || 0,
+                    },
+                    {
+                      name: 'Viewer',
+                      value: getAdmins.filter((admin) => admin.role === 'Viewer').length || 0,
+                    },
                   ]}
                   nameKey="name"
                   dataKey="value"
