@@ -44,7 +44,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { updateEmployee } = useEmployees();
-  const { Sectors, Directors, Teams } = useOrganization();
+  const { Sectors, Directors, Teams,Subcities } = useOrganization();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<Partial<Employee>>({
@@ -424,17 +424,19 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
+              
             {/* Status */}
-            <div className="flex items-center space-x-2">
+            <div className="flex pt-5 items-center space-x-2">
               <Checkbox
                 id="works_in_head_office"
                 checked={formData.works_in_head_office}
                 onCheckedChange={(checked) => handleInputChange('works_in_head_office', checked)}
+                  className='h-6 w-6 '
               />
               <Label htmlFor="works_in_head_office">Works in main office?</Label>
             </div>
+            </div>
+
           </TabsContent>
 
           <TabsContent value="location" className="space-y-6">
@@ -449,11 +451,21 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="subcity">{t('subcity') || 'Subcity'}</Label>
-                <Input
-                  id="subcity"
-                  value={formData.subcity?.id!}
-                  onChange={(e) => handleInputChange('subcity', e.target.value)}
-                />
+                <Select
+                  value={formData.subcity?.toString()}
+                  onValueChange={(value) => handleInputChange('subcity', parseInt(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select Subcity' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Subcities.map((subcity) => (
+                      <SelectItem key={subcity.id} value={subcity.id.toString()}>
+                        {subcity.name_en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="office_number">{t('officeNumber') || 'Office Number'}</Label>

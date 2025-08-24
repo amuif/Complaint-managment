@@ -35,7 +35,6 @@ export default function SuperAdminAnalyticsPage() {
   const { employees } = useEmployees();
   const { publicRatings } = useRatings();
   const { publicFeedback } = useFeedback();
-  const [complaintData, setComplaintData] = useState<{ name: string; value: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -113,15 +112,10 @@ export default function SuperAdminAnalyticsPage() {
   }, [employees, dateRange, selectedRegion]);
 
   // Complaint distribution by region (for bar chart)
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-
+  // Complaint distribution by region (for bar chart)
+  const complaintData = useMemo(() => {
     if (!filteredComplaints || filteredComplaints.length === 0) {
-      setError('No complaint data available');
-      setComplaintData([]);
-      setIsLoading(false);
-      return;
+      return [];
     }
 
     try {
@@ -132,21 +126,15 @@ export default function SuperAdminAnalyticsPage() {
         complaintCount[regionName] = (complaintCount[regionName] || 0) + 1;
       });
 
-      const complaintDataArray = Object.entries(complaintCount).map(([name, value]) => ({
+      return Object.entries(complaintCount).map(([name, value]) => ({
         name,
         value,
       }));
-
-      setComplaintData(complaintDataArray);
     } catch (err) {
       console.error('Error processing complaint data:', err);
-      setError('Error processing complaint data');
-      setComplaintData([]);
-    } finally {
-      setIsLoading(false);
+      return [];
     }
   }, [filteredComplaints, Subcities]);
-
   return (
     <div className="space-y-6">
       {/* Filters */}
@@ -240,12 +228,9 @@ export default function SuperAdminAnalyticsPage() {
                 <CardTitle>{t('complaintDistribution') || 'Complaint Distribution'}</CardTitle>
                 <CardDescription>{t('byRegion') || 'By Region'}</CardDescription>
               </CardHeader>
+
               <CardContent>
-                {isLoading ? (
-                  <div className="text-center">{t('loading') || 'Loading...'}</div>
-                ) : error ? (
-                  <div className="text-center text-red-500">{error}</div>
-                ) : complaintData.length === 0 ? (
+                {complaintData.length === 0 ? (
                   <div className="text-center text-gray-500">
                     {t('noDataAvailable') || 'No data available'}
                   </div>
@@ -266,9 +251,19 @@ export default function SuperAdminAnalyticsPage() {
               <CardContent>
                 <PieChart
                   data={[
-                    { name: 'Pending', value: filteredComplaints.filter((c) => c.status === 'submitted').length  || 0},
-                    { name: t('inProgress') || 'In Progress', value: filteredComplaints.filter((c) => c.status === 'investigating').length || 0 },
-                    { name: t('resolved') || 'Resolved', value: filteredComplaints.filter((c) => c.status === 'resolved').length  || 0},
+                    {
+                      name: 'Pending',
+                      value: filteredComplaints.filter((c) => c.status === 'submitted').length || 0,
+                    },
+                    {
+                      name: t('inProgress') || 'In Progress',
+                      value:
+                        filteredComplaints.filter((c) => c.status === 'investigating').length || 0,
+                    },
+                    {
+                      name: t('resolved') || 'Resolved',
+                      value: filteredComplaints.filter((c) => c.status === 'resolved').length || 0,
+                    },
                   ]}
                   nameKey="name"
                   dataKey="value"
@@ -286,9 +281,24 @@ export default function SuperAdminAnalyticsPage() {
               <CardContent>
                 <PieChart
                   data={[
-                    { name: 'Positive', value: filteredFeedback.filter((f) => Number(f.overall_satisfaction) > 3).length  || 0},
-                    { name: 'Neutral', value: filteredFeedback.filter((f) => Number(f.overall_satisfaction) === 3).length  || 0},
-                    { name: 'Negative', value: filteredFeedback.filter((f) => Number(f.overall_satisfaction) < 3).length  || 0},
+                    {
+                      name: 'Positive',
+                      value:
+                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) > 3).length ||
+                        0,
+                    },
+                    {
+                      name: 'Neutral',
+                      value:
+                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) === 3)
+                          .length || 0,
+                    },
+                    {
+                      name: 'Negative',
+                      value:
+                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) < 3).length ||
+                        0,
+                    },
                   ]}
                   nameKey="name"
                   dataKey="value"
@@ -315,7 +325,7 @@ export default function SuperAdminAnalyticsPage() {
                       name: 'Admin',
                       value: getAdmins.filter((admin) => admin.role === 'Admin').length || 0,
                     },
-                    { name: t('employees') || 'Employees', value: filteredEmployees.length  || 0},
+                    { name: t('employees') || 'Employees', value: filteredEmployees.length || 0 },
                   ]}
                   nameKey="name"
                   dataKey="value"
@@ -329,4 +339,3 @@ export default function SuperAdminAnalyticsPage() {
     </div>
   );
 }
-
