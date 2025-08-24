@@ -156,7 +156,7 @@ export function ExportDialog({
                 <Checkbox
                   id="include-filters"
                   checked={includeFilters}
-                  onCheckedChange={setIncludeFilters}
+                  onCheckedChange={(checked) => setIncludeFilters(checked === true)}
                 />
                 <Label htmlFor="include-filters" className="text-sm cursor-pointer">
                   Apply current filters ({getActiveFiltersCount()} active)

@@ -9,7 +9,7 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/re
 export function useOrganization() {
   const queryClient = useQueryClient();
   const { language } = useLanguage();
-  const { token, isAuthenticated } = useAuthStore();
+  const { token, isAuthenticated, user } = useAuthStore();
   const getSectorsQuery = useQuery({
     queryKey: ['get-sectors'],
     queryFn: async () => {
@@ -44,6 +44,16 @@ export function useOrganization() {
     queryFn: async () => {
       return publicApi.getDirectors(language);
     },
+  });
+  const getDirectorsBySector = useQuery({
+    queryKey: ['get-directors-by-sector', user?.sector_id, language],
+    queryFn: async () => {
+      if (!user || !user.sector_id) {
+        return [];
+      }
+      return publicApi.getDirectorsBySectors(user.sector_id, language);
+    },
+    enabled: !!user && !!user.sector_id,
   });
   const createDirectorsQuery = useMutation({
     mutationKey: ['create-director'],
@@ -114,6 +124,7 @@ export function useOrganization() {
     updateSectors: updateSectorsMutation.mutateAsync || [],
     deleteSector: deleteSectorMutation.mutateAsync,
     Directors: getDirectorsQuery.data || [],
+    DirectorsBySector: getDirectorsBySector.data || [],
     getDirectors: getDirectorsQuery.refetch,
     createDirector: createDirectorsQuery.mutateAsync || [],
     updateDirector: updateDirectorsQuery.mutateAsync || [],

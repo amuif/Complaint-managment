@@ -156,6 +156,13 @@ export const publicApi = {
     const response = await fetch(withLang(`${API_BASE_URL}/divisions`, lang));
     return handleDataResponse<Division[]>(response);
   },
+  getDirectorsBySectors: async (sector_id: string | null, lang: string): Promise<Division[]> => {
+    if (!sector_id) {
+      return [];
+    }
+    const response = await fetch(withLang(`${API_BASE_URL}/sectors/${sector_id}/divisions`, lang));
+    return handleDataResponse<Division[]>(response);
+  },
   // Get departments(teams)
   getDepartments: async (lang?: string): Promise<Department[]> => {
     const response = await fetch(withLang(`${API_BASE_URL}/departments`, lang));
@@ -833,18 +840,6 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Network error' }));
-
-    // Handle token expiration
-    if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('token');
-      localStorage.removeItem('admin');
-      // Redirect to login page
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
-    }
-
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
 

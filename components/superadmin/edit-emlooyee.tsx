@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,7 @@ import { useEmployees } from '@/hooks/use-employees';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 import { useOrganization } from '@/hooks/use-organization';
 import { PICTURE_URL } from '@/constants/base_url';
+import { Checkbox } from '../ui/checkbox';
 
 interface EditEmployeeProps {
   employee: Employee;
@@ -82,6 +83,8 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
     team_id: employee.team_id,
     sector_id: employee.sector_id,
     division_id: employee.division_id,
+    works_in_head_office: employee.works_in_head_office,
+
     // Professional information
     specializations: employee.specializations || '',
     years_of_service: employee.years_of_service || 0,
@@ -93,6 +96,9 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
     updated_at: employee.updated_at || '',
   });
 
+  useEffect(() => {
+    console.log(employee);
+  }, [employee]);
   const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -420,23 +426,14 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="section">{t('section') || 'Section'}</Label>
-              <Input
-                id="section"
-                value={formData.section}
-                onChange={(e) => handleInputChange('section', e.target.value)}
-              />
-            </div>
-
             {/* Status */}
             <div className="flex items-center space-x-2">
-              <Switch
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) => handleInputChange('is_active', checked)}
+              <Checkbox
+                id="works_in_head_office"
+                checked={formData.works_in_head_office}
+                onCheckedChange={(checked) => handleInputChange('works_in_head_office', checked)}
               />
-              <Label htmlFor="is_active">{t('activeEmployee') || 'Active Employee'}</Label>
+              <Label htmlFor="works_in_head_office">Works in main office?</Label>
             </div>
           </TabsContent>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Plus, Download, Filter } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -21,14 +21,18 @@ import { EmployeeAnalytics } from '@/components/superadmin/employee-analytics';
 import { AddEmployeeDialog } from '@/components/superadmin/add-employee-dialog';
 import { ExportDialog } from '@/components/superadmin/export-dialog';
 import { useOrganization } from '@/hooks/use-organization';
+import { useAuthStore } from '@/lib/auth-store';
 
 export default function AllAdminEmployeesPage() {
   const { t } = useLanguage();
-  const { Directors, Subcities } = useOrganization();
+  const { DirectorsBySector, Subcities } = useOrganization();
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [viewType, setViewType] = useState('list');
+  useEffect(() => {
+    console.log(DirectorsBySector);
+  }, [DirectorsBySector]);
 
   return (
     <div className="space-y-6">
@@ -88,7 +92,7 @@ export default function AllAdminEmployeesPage() {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="all">All Directors</SelectItem>
-                  {Directors.map((director) => (
+                  {DirectorsBySector.map((director) => (
                     <SelectItem key={director.id} value={director.id}>
                       {director.name_en}
                     </SelectItem>

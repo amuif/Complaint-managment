@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Plus, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Sector } from '@/types/sector';
+import { Division } from '@/types/division';
+import { Checkbox } from '../ui/checkbox';
+import { useAuthStore } from '@/lib/auth-store';
 
 interface AddEmployeeDialogProps {
   onSuccess?: () => void;
@@ -40,10 +44,10 @@ const employeeSchema = z.object({
   first_name_en: z.string().min(1, 'First name (English) is required'),
   first_name_am: z.string().optional(),
   first_name_af: z.string().optional(),
-  middle_name_en: z.string().optional(),
+  middle_name_en: z.string().min(1, 'Middle name (English) is required'),
   middle_name_am: z.string().optional(),
   middle_name_af: z.string().optional(),
-  last_name_en: z.string().min(1, 'Last name (English) is required'),
+  last_name_en: z.string().optional(),
   last_name_am: z.string().optional(),
   last_name_af: z.string().optional(),
   position_en: z.string().min(1, 'Position (English) is required'),
@@ -51,10 +55,11 @@ const employeeSchema = z.object({
   position_af: z.string().optional(),
   section: z.string().optional(),
   city: z.string().optional(),
+  works_in_head_office: z.boolean().default(false).optional(),
   sector_id: z.string().min(1, 'Sector is required'),
   department_id: z.string().min(1, 'Team is required'),
   division_id: z.string().min(1, 'Director is required'),
-  subcity_id: z.string().min(1, 'Subcity is required'),
+  subcity_id: z.string().optional(),
   office_number: z.string().min(1, 'Office number is required'),
   floor_number: z.string().refine((val) => !Number.isNaN(Number(val)), {
     message: 'Floor number is required and must be a number',
@@ -72,10 +77,39 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
   const { t } = useLanguage();
   const { createEmployee, isCreatingEmployee } = useEmployees();
   const { Sectors, Directors, Subcities, Teams } = useOrganization();
+  const { user } = useAuthStore();
 
   const [open, setOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState('basic');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
+  const [selectedDirector, setSelectedDirector] = useState<Division | null>(null);
+  const [filteredDirectors, setFilteredDirectors] = useState<Division[]>([]);
+  const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
+
+  useEffect(() => {
+    const desiredSector = Sectors.find((sector) => sector.id === user?.sector_id);
+    setSelectedSector(desiredSector!);
+    if (user?.division_id) {
+      const desiredDirector = Directors.find((director) => director.id === user?.division_id);
+      setSelectedDirector(desiredDirector!);
+    }
+  }, [user]);
+  useEffect(() => {
+    if (selectedSector) {
+      setFilteredDirectors(
+        Directors.filter((director) => director.sector_id === selectedSector.id)
+      );
+      setSelectedDirector(null);
+      setFilteredTeams([]);
+    }
+  }, [selectedSector, Directors]);
+
+  useEffect(() => {
+    if (selectedDirector) {
+      setFilteredTeams(Teams.filter((team) => team.division_id === selectedDirector.id));
+    }
+  }, [selectedDirector, Teams]);
 
   const {
     register,
@@ -103,6 +137,7 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
       section: '',
       city: '',
       sector_id: '',
+      works_in_head_office: false,
       division_id: '',
       department_id: '',
       subcity_id: '',
@@ -128,12 +163,11 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
         }
       }
 
+      console.log(payload);
       const response = await createEmployee(payload);
       handleApiSuccess(response.message);
       setOpen(false);
       reset();
-      setCurrentTab('basic');
-      onSuccess?.();
     } catch (error: any) {
       handleApiError(error?.message || 'Failed to add employee');
     }
@@ -237,78 +271,80 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <div>
-                  <Label>Sectors *</Label>
-                  <Controller
-                    control={control}
-                    name="sector_id"
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Sector" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Sectors.map((sector) => (
-                            <SelectItem key={sector.id} value={String(sector.id)}>
-                              {sector.name_en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.sector_id && (
-                    <p className="text-red-500 text-sm">{errors.sector_id.message}</p>
+                {/* Sector */}
+                <Controller
+                  control={control}
+                  name="sector_id"
+                  render={({ field }) => (
+                    <Select
+                      value={String(field.value)}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        const sector = Sectors.find((s) => String(s.id) === val) || null;
+                        setSelectedSector(sector);
+                      }}
+                      // disabled={}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={selectedSector?.name_en ?? 'Select Sector'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Sectors.map((sector) => (
+                          <SelectItem key={sector.id} value={String(sector.id)}>
+                            {sector.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
-                <div>
-                  <Label>Directors *</Label>
-                  <Controller
-                    control={control}
-                    name="division_id"
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Director" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Directors.map((director) => (
-                            <SelectItem key={director.id} value={String(director.id)}>
-                              {director.name_en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.division_id && (
-                    <p className="text-red-500 text-sm">{errors.division_id.message}</p>
+                />
+
+                {/* Director */}
+                <Controller
+                  control={control}
+                  name="division_id"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        const director = Directors.find((d) => String(d.id) === val) || null;
+                        setSelectedDirector(director);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={selectedDirector?.name_en || 'Select director'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredDirectors.map((director) => (
+                          <SelectItem key={director.id} value={String(director.id)}>
+                            {director.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
-                <div>
-                  <Label>Team *</Label>
-                  <Controller
-                    control={control}
-                    name="department_id"
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Team" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Teams.map((team) => (
-                            <SelectItem key={team.id} value={String(team.id)}>
-                              {team.name_en}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.department_id && (
-                    <p className="text-red-500 text-sm">{errors.department_id.message}</p>
+                />
+
+                {/* Team */}
+                <Controller
+                  control={control}
+                  name="department_id"
+                  render={({ field }) => (
+                    <Select value={String(field.value)} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Team" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredTeams.map((team) => (
+                          <SelectItem key={team.id} value={String(team.id)}>
+                            {team.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
+                />
               </div>
             </TabsContent>
 
@@ -339,6 +375,21 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                   {errors.subcity_id && (
                     <p className="text-red-500 text-sm">{errors.subcity_id.message}</p>
                   )}
+                </div>
+
+                <div className="flex h-full pt-3 items-center space-x-2">
+                  <Controller
+                    name="works_in_head_office"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        className="h-6 w-6"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Label htmlFor="works_in_head_office">Works in head office?</Label>
                 </div>
               </div>
 

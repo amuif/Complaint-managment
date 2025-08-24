@@ -39,6 +39,7 @@ export interface Employee {
   section: string;
   city: string | null;
   subcity: Subcities;
+  works_in_head_office: boolean;
 
   email: string | null;
   phone: string | null;
