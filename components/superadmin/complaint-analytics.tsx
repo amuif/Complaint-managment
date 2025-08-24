@@ -10,14 +10,9 @@ import { Badge } from '@/components/ui/badge';
 interface ComplaintAnalyticsProps {
   regionFilter: string;
   statusFilter: string;
-  priorityFilter: string;
 }
 
-export function ComplaintAnalytics({
-  regionFilter,
-  statusFilter,
-  priorityFilter,
-}: ComplaintAnalyticsProps) {
+export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnalyticsProps) {
   const { t } = useLanguage();
   const [chartType, setChartType] = useState('status');
 

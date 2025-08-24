@@ -58,7 +58,6 @@ interface ComplaintManagementTableProps {
   searchQuery: string;
   regionFilter: string;
   statusFilter: string;
-  priorityFilter: string;
   onViewComplaint: (complaint: Complaint) => void;
   onEditComplaint: (complaint: Complaint) => void;
 }
@@ -78,7 +77,6 @@ export function ComplaintManagementTable({
   searchQuery,
   regionFilter,
   statusFilter,
-  priorityFilter,
 }: ComplaintManagementTableProps) {
   const [status, setStatus] = useState<ComplaintStatus>('submitted');
   const { t } = useLanguage();
@@ -114,7 +112,9 @@ export function ComplaintManagementTable({
     isRespondingToPublicComplaint,
     editPublicComplaintStatus,
   } = useComplaints();
-  useEffect(()=>{ console.log(complaints)},[complaints])
+  useEffect(() => {
+    console.log(complaints);
+  }, [complaints]);
   useEffect(() => {
     if (opedEditStatus?.complaint?.status) {
       setStatus(opedEditStatus.complaint.status);

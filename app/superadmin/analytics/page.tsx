@@ -135,6 +135,9 @@ export default function SuperAdminAnalyticsPage() {
       return [];
     }
   }, [filteredComplaints, Subcities]);
+  useEffect(() => {
+    console.log(publicFeedback?.feedback);
+  }, [publicFeedback]);
   return (
     <div className="space-y-6">
       {/* Filters */}
@@ -282,21 +285,20 @@ export default function SuperAdminAnalyticsPage() {
                 <PieChart
                   data={[
                     {
-                      name: 'Positive',
+                      name: 'Complaint',
                       value:
-                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) > 3).length ||
+                        filteredFeedback.filter((f) => f.feedback_type === 'concern').length || 0,
+                    },
+                    {
+                      name: 'Suggestion',
+                      value:
+                        filteredFeedback.filter((f) => f.feedback_type === 'suggestion').length ||
                         0,
                     },
                     {
-                      name: 'Neutral',
+                      name: 'Compliment',
                       value:
-                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) === 3)
-                          .length || 0,
-                    },
-                    {
-                      name: 'Negative',
-                      value:
-                        filteredFeedback.filter((f) => Number(f.overall_satisfaction) < 3).length ||
+                        filteredFeedback.filter((f) => f.feedback_type === 'compliment').length ||
                         0,
                     },
                   ]}

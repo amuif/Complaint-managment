@@ -28,7 +28,6 @@ export default function ComplaintsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
   const [viewType, setViewType] = useState('list');
 
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
@@ -47,7 +46,6 @@ export default function ComplaintsPage() {
             filters={{
               regionFilter,
               statusFilter,
-              priorityFilter,
               searchQuery,
             }}
             triggerText={t('exportComplaints')}
@@ -101,22 +99,6 @@ export default function ComplaintsPage() {
               </SelectContent>
             </Select>
 
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="w-[140px] rounded-full">
-                <SelectValue placeholder={t('priority')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>{t('priority')}</SelectLabel>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="urgent">{t('urgent')}</SelectItem>
-                  <SelectItem value="high">{t('high')}</SelectItem>
-                  <SelectItem value="medium">{t('medium')}</SelectItem>
-                  <SelectItem value="low">{t('low')}</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
             <TabsList className="grid w-[200px] grid-cols-2">
               <TabsTrigger value="list">{t('list')}</TabsTrigger>
               <TabsTrigger value="analytics">{t('analytics')}</TabsTrigger>
@@ -129,18 +111,13 @@ export default function ComplaintsPage() {
             searchQuery={searchQuery}
             regionFilter={regionFilter}
             statusFilter={statusFilter}
-            priorityFilter={priorityFilter}
             onViewComplaint={setSelectedComplaint}
             onEditComplaint={setEditingComplaint}
           />
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6">
-          <ComplaintAnalytics
-            regionFilter={regionFilter}
-            statusFilter={statusFilter}
-            priorityFilter={priorityFilter}
-          />
+          <ComplaintAnalytics regionFilter={regionFilter} statusFilter={statusFilter} />
         </TabsContent>
       </Tabs>
 
