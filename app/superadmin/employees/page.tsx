@@ -20,9 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmployeeAnalytics } from '@/components/superadmin/employee-analytics';
 import { AddEmployeeDialog } from '@/components/superadmin/add-employee-dialog';
 import { ExportDialog } from '@/components/superadmin/export-dialog';
+import { useOrganization } from '@/hooks/use-organization';
 
 export default function AllEmployeesPage() {
   const { t } = useLanguage();
+  const { Subcities, Directors } = useOrganization();
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
@@ -71,27 +73,28 @@ export default function AllEmployeesPage() {
                 <SelectGroup>
                   <SelectLabel>{t('region')}</SelectLabel>
                   <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="addis-ababa">Addis Ababa</SelectItem>
-                  <SelectItem value="amhara">Amhara</SelectItem>
-                  <SelectItem value="oromia">Oromia</SelectItem>
-                  <SelectItem value="tigray">Tigray</SelectItem>
-                  <SelectItem value="snnpr">SNNPR</SelectItem>
+                  {Subcities.map((subcity) => (
+                    <SelectItem key={subcity.id} value={subcity.id}>
+                      {subcity.name_en}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
               <SelectTrigger className="w-[180px] rounded-full">
-                <SelectValue placeholder={t('department')} />
+                <SelectValue placeholder="Director" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>{t('department')}</SelectLabel>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="operations">Operations</SelectItem>
-                  <SelectItem value="customer-service">Customer Service</SelectItem>
+                  <SelectLabel>Director</SelectLabel>
+                  <SelectItem value="all">All Directors</SelectItem>
+                  {Directors.map((director) => (
+                    <SelectItem key={director.id} value={director.id}>
+                      {director.name_en}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
