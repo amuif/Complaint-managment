@@ -71,7 +71,6 @@ export default function AllAdminEmployeesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>{t('region')}</SelectLabel>
                   <SelectItem value="all">All Regions</SelectItem>
                   {Subcities.map((subcity) => (
                     <SelectItem key={subcity.id} value={subcity.id}>
@@ -88,7 +87,6 @@ export default function AllAdminEmployeesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>{t('director')}</SelectLabel>
                   <SelectItem value="all">All Directors</SelectItem>
                   {Directors.map((director) => (
                     <SelectItem key={director.id} value={director.id}>

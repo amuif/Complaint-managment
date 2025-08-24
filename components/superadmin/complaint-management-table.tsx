@@ -114,6 +114,7 @@ export function ComplaintManagementTable({
     isRespondingToPublicComplaint,
     editPublicComplaintStatus,
   } = useComplaints();
+  useEffect(()=>{ console.log(complaints)},[complaints])
   useEffect(() => {
     if (opedEditStatus?.complaint?.status) {
       setStatus(opedEditStatus.complaint.status);

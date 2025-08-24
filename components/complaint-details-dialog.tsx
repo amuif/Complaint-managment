@@ -170,13 +170,22 @@ export function ComplaintDetailsDialog({
                 <CardTitle>Director & Sector</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div>
+                <div className="flex-col space-y-2">
                   <span className="font-medium">Director:</span>
                   <p className="text-sm ">{complaint.division?.name_en}</p>
+                  <div className="flex space-x-2 items-center">
+                    <p className="font-medium">Appointed person:</p>
+                    <p className="text-sm">{complaint.division?.appointed_person_en}</p>
+                  </div>
                 </div>
-                <div>
+                <div className="flex-col space-y-2">
                   <span className="font-medium">Sector:</span>
                   <p className="text-sm ">{complaint.sector?.name_en}</p>
+                  <div className="flex space-x-2 items-center">
+                    {' '}
+                    <p className="font-medium">Appointed person:</p>{' '}
+                    <p className="text-sm">{complaint.sector?.appointed_person_en}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

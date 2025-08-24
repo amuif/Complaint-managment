@@ -122,7 +122,7 @@ export function ComplaintViewDialog({ complaint, open, onOpenChange }: Complaint
                 <MapPin className="h-4 w-4" />
                 <span>Region</span>
               </div>
-              <p>{complaint.subcity || 'Not specified'}</p>
+              <p>{complaint.sub_city.name_en || 'Not specified'}</p>
             </div>
           </div>
         </div>
