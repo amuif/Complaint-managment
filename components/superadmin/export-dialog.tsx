@@ -53,13 +53,6 @@ export function ExportDialog({
       icon: FileSpreadsheet,
       color: 'text-blue-600',
     },
-    {
-      value: 'pdf',
-      label: 'PDF',
-      description: 'Portable document format',
-      icon: File,
-      color: 'text-red-600',
-    },
   ] as const;
 
   const getDataTypeLabel = () => {

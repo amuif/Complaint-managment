@@ -10,13 +10,14 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SuperAdminChart } from '@/components/superadmin/superadmin-chart';
 import { SystemAlerts } from '@/components/superadmin/system-alerts';
 import { RecentActivitySuperAdmin } from '@/components/superadmin/recent-activity';
-
+import ExportAllDialog from '@/components/export-all-dialog';
 // Import hooks for real data
 import { useStatistics } from '@/hooks/use-statistics';
 import { useComplaints } from '@/hooks/use-complaints';
 import { useFeedback } from '@/hooks/use-feedback';
 import { useRatings } from '@/hooks/use-ratings';
 import { useEmployees } from '@/hooks/use-employees';
+import { ExportDialog } from '@/components/superadmin/export-dialog';
 // import { useEmployees } from "@/hooks/use-employees";
 
 export default function SuperAdminDashboardPage() {
@@ -100,9 +101,7 @@ export default function SuperAdminDashboardPage() {
           <p className="text-muted-foreground">{t('superAdminDashboardDesc')}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button className="w-full md:w-auto rounded-full">
-            <Download className="mr-2 h-4 w-4" /> {t('exportSystemReport')}
-          </Button>
+          <ExportAllDialog />{' '}
         </div>
       </div>
 

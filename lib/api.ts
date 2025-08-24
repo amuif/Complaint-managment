@@ -1323,6 +1323,36 @@ export const subcityApi = {
     };
   },
 };
+export const reportExportApi = {
+  reportExport: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/admin/export-report`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `report-${Date.now()}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+};
 
 // Export functionality
 export const exportApi = {
