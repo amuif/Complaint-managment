@@ -1324,34 +1324,54 @@ export const subcityApi = {
   },
 };
 export const reportExportApi = {
-  reportExport: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error('Authentication required. Please log in again.');
-    }
+reportExport: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required. Please log in again.');
+  }
 
-    const response = await fetch(`${API_BASE_URL}/admin/export-report`, {
+  // Convert filters object to query string
+  const queryParams = new URLSearchParams();
+  queryParams.append('format', format);
+  
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        queryParams.append(key, String(value));
+      }
+    });
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/admin/export-report?${queryParams.toString()}`,
+    {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-
-    if (!response.ok) {
-      throw new Error('Export failed');
+      // Remove the body since we're using query parameters
     }
+  );
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+  if (!response.ok) {
+    throw new Error('Export failed');
+  }
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `report-${Date.now()}.${format}`;
-    document.body.appendChild(a);
-    a.click();
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
 
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-  },
+  const a = document.createElement('a');
+  a.href = url;
+  
+  // Use the correct file extension based on format
+  const extension = format === 'excel' ? 'xlsx' : format;
+  a.download = `report-${Date.now()}.${extension}`;
+  
+  document.body.appendChild(a);
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
 };
 
 // Export functionality
