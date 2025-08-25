@@ -2,6 +2,7 @@ import { Department } from './department';
 import { Division } from './division';
 import { Employee } from './employee';
 import { Sector } from './sector';
+import { Subcities } from './subcities';
 
 export interface Rating {
   // Identification
@@ -16,7 +17,7 @@ export interface Rating {
   phone_number: string;
 
   // Location
-  subcity?: string;
+  sub_city?: Subcities;
 
   // Rating Scores
   overall_rating: number;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Download, Users, FileText, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Download, Users, FileText, MessageSquare, Star } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,6 +17,7 @@ import { useEmployees } from '@/hooks/use-employees';
 import { useRatings } from '@/hooks/use-ratings';
 import { useFeedback } from '@/hooks/use-feedback';
 import { useComplaints } from '@/hooks/use-complaints';
+import { SubcityRating } from '@/components/superadmin/subcity-rating';
 
 export default function SubcityDetailPage() {
   const { t } = useLanguage();
@@ -85,7 +86,8 @@ export default function SubcityDetailPage() {
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {
                 publicRatings.filter(
-                  (rating) => rating.subcity?.toLowerCase() === formattedSubcity.toLowerCase()
+                  (rating) =>
+                    rating.sub_city?.name_en?.toLowerCase() === formattedSubcity.toLowerCase()
                 ).length
               }
             </p>
@@ -104,7 +106,7 @@ export default function SubcityDetailPage() {
 
       {/* Tabs for different sections */}
       <Tabs defaultValue="employees" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="employees">
             <Users className="h-4 w-4 mr-2" />
             {t('employees')}
@@ -113,6 +115,11 @@ export default function SubcityDetailPage() {
             <FileText className="h-4 w-4 mr-2" />
             {t('feedback')}
           </TabsTrigger>
+          <TabsTrigger value="rating">
+            <Star className="h-4 w-4 mr-2" />
+            Rating
+          </TabsTrigger>
+
           <TabsTrigger value="complaints">
             <MessageSquare className="h-4 w-4 mr-2" />
             {t('complaints')}
@@ -126,7 +133,9 @@ export default function SubcityDetailPage() {
         <TabsContent value="feedback" className="mt-6">
           <SubcityFeedback subcity={formattedSubcity} />
         </TabsContent>
-
+        <TabsContent value="rating" className="mt-6">
+          <SubcityRating subcity={formattedSubcity} />
+        </TabsContent>
         <TabsContent value="complaints" className="mt-6">
           <SubcityComplaints subcity={formattedSubcity} />
         </TabsContent>
