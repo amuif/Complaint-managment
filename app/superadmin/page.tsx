@@ -37,7 +37,7 @@ export default function SuperAdminDashboardPage() {
     ...(Array.isArray(complaints) ? complaints : []),
     ...(Array.isArray(publicComplaints) ? publicComplaints : []),
   ].filter((c) => c.status?.toLowerCase() === 'resolved').length;
-  const totalFeedback = (feedback?.length || 0) + (publicFeedback?.length || 0);
+  const totalFeedback = (feedback?.length || 0) + (publicFeedback?.feedback?.length || 0);
   const totalEmployees = employees?.length || 0;
 
   // Calculate average rating

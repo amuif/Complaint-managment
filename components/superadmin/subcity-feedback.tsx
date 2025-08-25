@@ -5,16 +5,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { Star, MessageSquare, User } from 'lucide-react';
+import { useFeedback } from '@/hooks/use-feedback';
 
 interface SubcityFeedbackProps {
   subcity: string;
 }
 
 export function SubcityFeedback({ subcity }: SubcityFeedbackProps) {
-  // Convert formatted subcity back to database format
-  // For "Bole Sub City" -> "Bole", "Arada Sub City" -> "Arada", etc.
-  const subcityName = subcity.split(' ')[0];
-  const { feedback, publicFeedback, isLoading, isError } = useSubcityFeedback(subcityName);
+  const { feedback, publicFeedback, isLoading, isError } = useFeedback();
 
   if (isLoading) {
     return (
@@ -89,12 +87,8 @@ export function SubcityFeedback({ subcity }: SubcityFeedbackProps) {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{fb.phone_number}</span>
+                      #<span className="text-sm font-medium">{fb.phone_number}</span>
                     </div>
-                    {fb.rating && (
-                      <div className="flex items-center gap-1">{renderStars(fb.rating)}</div>
-                    )}
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-3">
@@ -102,13 +96,8 @@ export function SubcityFeedback({ subcity }: SubcityFeedbackProps) {
                   </p>
 
                   <div className="space-y-1 text-xs text-muted-foreground">
-                    <div>Department: {fb.department}</div>
-                    <div>Section: {fb.section}</div>
-                    {fb.employee && (
-                      <div>
-                        Employee: {fb.employee.first_name} {fb.employee.last_name}
-                      </div>
-                    )}
+                    <div>Sector: {fb?.sector?.name_en}</div>
+                    <div>Director: {fb?.division?.name_en}</div>
                     <div>Date: {format(parseISO(fb.created_at), 'MMM dd, yyyy')}</div>
                   </div>
 

@@ -5,17 +5,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { CheckCircle, Clock, AlertCircle, XCircle, MessageSquare, User } from 'lucide-react';
+import { useComplaints } from '@/hooks/use-complaints';
+import { useEffect, useState } from 'react';
+import { Complaint } from '@/types/complaint';
 
 interface SubcityComplaintsProps {
   subcity: string;
 }
 
 export function SubcityComplaints({ subcity }: SubcityComplaintsProps) {
-  // Convert formatted subcity back to database format
-  // For "Bole Sub City" -> "Bole", "Arada Sub City" -> "Arada", etc.
-  const subcityName = subcity.split(' ')[0];
-  const { complaints, publicComplaints, isLoading, isError } = useSubcityComplaints(subcityName);
+  const { complaints, publicComplaints, isLoading, isError } = useComplaints();
+  const [validComplaints, setValidComplaints] = useState<Complaint[]>([]);
+  useEffect(() => {
+    const valid =
+      publicComplaints?.filter(
+        (complaint) => complaint?.sub_city?.name_en?.toLowerCase() === subcity.toLowerCase()
+      ) || [];
 
+    setValidComplaints(valid);
+  }, [publicComplaints, subcity]);
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -50,12 +58,6 @@ export function SubcityComplaints({ subcity }: SubcityComplaintsProps) {
     );
   }
 
-  // Combine both complaint sources
-  const allComplaints = [
-    ...(Array.isArray(complaints) ? complaints : []),
-    ...(Array.isArray(publicComplaints) ? publicComplaints : []),
-  ];
-
   const getStatusIcon = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'resolved':
@@ -79,7 +81,7 @@ export function SubcityComplaints({ subcity }: SubcityComplaintsProps) {
           ? 'secondary'
           : status?.toLowerCase() === 'in_progress'
             ? 'outline'
-            : 'destructive';
+            : 'default';
 
     return (
       <Badge variant={variant} className="text-xs">
@@ -94,42 +96,48 @@ export function SubcityComplaints({ subcity }: SubcityComplaintsProps) {
         <h3 className="text-lg font-semibold">Complaints</h3>
         <Badge variant="secondary">
           <MessageSquare className="w-3 h-3 mr-1" />
-          {allComplaints.length} complaints
+          {validComplaints.length} complaints
         </Badge>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {allComplaints.length === 0 ? (
+        {validComplaints.length === 0 ? (
           <Card className="col-span-full">
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center">No complaints found for {subcity}</p>
             </CardContent>
           </Card>
         ) : (
-          allComplaints.slice(0, 6).map((complaint) => (
+          validComplaints.slice(0, 6).map((complaint) => (
             <Card key={complaint.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-4">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(complaint.status)}
-                      <span className="text-sm font-medium">#{complaint.tracking_code}</span>
+                      <span className="text-sm font-medium">#{complaint.phone_number}</span>
                     </div>
                     {getStatusBadge(complaint.status)}
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {complaint.description}
+                    <span className="text-black dark:text-white">Complaint:</span>{' '}
+                    {complaint.complaint_description}
                   </p>
 
                   <div className="space-y-1 text-xs text-muted-foreground">
-                    <div>Department: {complaint.department}</div>
-                    {complaint.Employee && (
-                      <div>
-                        Employee: {complaint.Employee.first_name} {complaint.Employee.last_name}
-                      </div>
-                    )}
-                    <div>Date: {format(parseISO(complaint.created_at), 'MMM dd, yyyy')}</div>
+                    <div>
+                      <span className="text-black dark:text-white">Sector:</span>{' '}
+                      {complaint.sector?.name_en}
+                    </div>
+                    <div>
+                      <span className="text-black dark:text-white">Division:</span>{' '}
+                      {complaint.division?.name_en}
+                    </div>
+                    <div>
+                      <span className="text-black dark:text-white">Date:</span>{' '}
+                      {format(parseISO(complaint.created_at), 'MMM dd, yyyy')}
+                    </div>
                   </div>
 
                   {complaint.response && (

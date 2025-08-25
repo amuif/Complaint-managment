@@ -1,20 +1,27 @@
 'use client';
 
-import { useSubcityEmployees } from '@/hooks/use-subcity';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Users, Building, MapPin } from 'lucide-react';
+import { useEmployees } from '@/hooks/use-employees';
+import { useMemo } from 'react';
+import { Employee } from '@/types/employee';
 
 interface SubcityEmployeesProps {
   subcity: string;
 }
 
 export function SubcityEmployees({ subcity }: SubcityEmployeesProps) {
-  // Convert formatted subcity back to database format
-  // For "Bole Sub City" -> "Bole", "Arada Sub City" -> "Arada", etc.
-  const subcityName = subcity.split(' ')[0];
-  const { employees, isLoading, isError } = useSubcityEmployees(subcityName);
+  const { employees, isLoading, isError } = useEmployees();
+
+  const validEmployees = useMemo(() => {
+    if (!employees || !Array.isArray(employees)) return [];
+
+    return employees.filter(
+      (employee) => employee?.subcity?.name_en?.toLowerCase() === subcity.toLowerCase()
+    );
+  }, [employees, subcity]);
 
   if (isLoading) {
     return (
@@ -62,40 +69,40 @@ export function SubcityEmployees({ subcity }: SubcityEmployeesProps) {
         <h3 className="text-lg font-semibold">Employees</h3>
         <Badge variant="secondary">
           <Users className="w-3 h-3 mr-1" />
-          {employees.length} employees
+          {validEmployees.length} employees
         </Badge>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {employees.length === 0 ? (
+        {validEmployees.length === 0 ? (
           <Card className="col-span-full">
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center">No employees found for {subcity}</p>
             </CardContent>
           </Card>
         ) : (
-          employees.map((employee) => (
+          validEmployees.map((employee) => (
             <Card key={employee.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-3">
                   <Avatar>
                     <AvatarFallback>
-                      {employee.first_name?.[0]}
-                      {employee.last_name?.[0]}
+                      {employee.first_name_en?.[0]}
+                      {employee.last_name_en?.[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h4 className="font-medium text-sm">
-                      {employee.first_name} {employee.last_name}
+                      {employee.first_name_en} {employee.last_name_en}
                     </h4>
-                    <p className="text-xs text-muted-foreground">{employee.position}</p>
+                    <p className="text-xs text-muted-foreground">{employee.position_en}</p>
                   </div>
                 </div>
 
                 <div className="space-y-2 text-xs">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Building className="h-3 w-3" />
-                    <span>{employee.department}</span>
+                    <span>{employee.department?.name_en}</span>
                   </div>
 
                   {employee.office_number && (

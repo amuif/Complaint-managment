@@ -51,11 +51,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { useOrganization } from '@/hooks/use-organization';
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const pathname = usePathname();
   const { logout, user } = useAuth();
+  const {Subcities} =useOrganization()
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -75,7 +77,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
     { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
-    { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
+    // { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
   ];
 
   return (
@@ -131,25 +133,18 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {/* Only Addis Ababa */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname.startsWith('/superadmin/subcities/addis-ababa')}
-                    >
-                      <span>Addis Ababa</span>
-                    </SidebarMenuButton>
-                    <SidebarMenuSub>
-                      {['Arada', 'Kirkos', 'Lideta', 'Bole'].map((sub) => (
-                        <SidebarMenuSubItem key={sub}>
+                   <SidebarMenuSub>
+                      {Subcities.map((sub) => (
+                        <SidebarMenuSubItem key={sub.id}>
                           <SidebarMenuSubButton
                             asChild
                             isActive={
-                              pathname === `/superadmin/subcities/addis-ababa/${sub.toLowerCase()}`
+                              pathname === `/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`
                             }
                           >
-                            <Link href={`/superadmin/subcities/addis-ababa/${sub.toLowerCase()}`}>
-                              {sub}
+                            <Link href={`/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`}>
+                              {sub.name_en}
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
