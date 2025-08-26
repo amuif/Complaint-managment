@@ -77,7 +77,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
     { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
-    // { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
+    { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
   ];
 
   return (
@@ -209,9 +209,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>{user?.username || t('superAdmin')}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>{t('profile')}</DropdownMenuItem>
-                  <DropdownMenuItem>{t('settings')}</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>{t('logout')}</DropdownMenuItem>
                 </DropdownMenuContent>

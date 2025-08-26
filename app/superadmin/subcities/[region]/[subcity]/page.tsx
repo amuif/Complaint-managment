@@ -18,6 +18,8 @@ import { useRatings } from '@/hooks/use-ratings';
 import { useFeedback } from '@/hooks/use-feedback';
 import { useComplaints } from '@/hooks/use-complaints';
 import { SubcityRating } from '@/components/superadmin/subcity-rating';
+import { useOrganization } from '@/hooks/use-organization';
+import ExportSubcityDialog from '@/components/export-subcity-dialog';
 
 export default function SubcityDetailPage() {
   const { t } = useLanguage();
@@ -25,6 +27,8 @@ export default function SubcityDetailPage() {
   const { publicRatings } = useRatings();
   const { publicFeedback } = useFeedback();
   const { publicComplaints } = useComplaints();
+  const { Subcities } = useOrganization();
+  const [subcityId, setSubcityId] = useState<number>();
   const params = useParams();
   const region = params.region as string;
   const subcity = params.subcity as string;
@@ -32,6 +36,13 @@ export default function SubcityDetailPage() {
   // Format region and subcity names for display
   const formattedRegion = region.toLowerCase().replace('-', ' ');
   const formattedSubcity = subcity.toLowerCase().replace('-', ' ');
+  useEffect(() => {
+    const subcity_id = Subcities.filter(
+      (subcity) => subcity.name_en.toLowerCase() === formattedSubcity.toLowerCase()
+    ).map((item) => item.id);
+    console.log(subcity_id);
+    setSubcityId(Number(subcity_id));
+  }, [formattedSubcity, Subcities]);
 
   return (
     <div className="space-y-6">
@@ -44,9 +55,7 @@ export default function SubcityDetailPage() {
             {formattedRegion} &gt; {formattedSubcity}
           </p>
         </div>
-        <Button className="w-full md:w-auto rounded-full">
-          <Download className="mr-2 h-4 w-4" /> {t('exportSubcityReport')}
-        </Button>
+        <ExportSubcityDialog subcity_id={subcityId!} />
       </div>
 
       {/* Subcity Overview and Statistics */}

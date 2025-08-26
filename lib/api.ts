@@ -1324,56 +1324,94 @@ export const subcityApi = {
   },
 };
 export const reportExportApi = {
-reportExport: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
-  const token = getAuthToken();
-  if (!token) {
-    throw new Error('Authentication required. Please log in again.');
-  }
+  reportExport: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
 
-  // Convert filters object to query string
-  const queryParams = new URLSearchParams();
-  queryParams.append('format', format);
-  
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        queryParams.append(key, String(value));
-      }
-    });
-  }
+    // Convert filters object to query string
+    const queryParams = new URLSearchParams();
+    queryParams.append('format', format);
 
-  const response = await fetch(
-    `${API_BASE_URL}/admin/export-report?${queryParams.toString()}`,
-    {
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(`${API_BASE_URL}/admin/export-report?${queryParams.toString()}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      // Remove the body since we're using query parameters
+    });
+
+    if (!response.ok) {
+      throw new Error('Export failed');
     }
-  );
 
-  if (!response.ok) {
-    throw new Error('Export failed');
-  }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
 
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
 
-  const a = document.createElement('a');
-  a.href = url;
-  
-  // Use the correct file extension based on format
-  const extension = format === 'excel' ? 'xlsx' : format;
-  a.download = `report-${Date.now()}.${extension}`;
-  
-  document.body.appendChild(a);
-  a.click();
+    const extension = format === 'excel' ? 'xlsx' : format;
+    a.download = `report-${Date.now()}.${extension}`;
 
-  window.URL.revokeObjectURL(url);
-  document.body.removeChild(a);
-}
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+  subcityExport: async (format: 'pdf' | 'csv' | 'excel', subcity_id: string, filters?: any) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('format', format);
+    queryParams.append('subcity_id', subcity_id);
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(`${API_BASE_URL}/admin/export-subcity?${queryParams.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+
+    // Use the correct file extension based on format
+    const extension = format === 'excel' ? 'xlsx' : format;
+    a.download = `report-${Date.now()}.${extension}`;
+
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
 };
-
 // Export functionality
 export const exportApi = {
   exportComplaints: async (format: 'pdf' | 'csv' | 'excel', filters?: any) => {
