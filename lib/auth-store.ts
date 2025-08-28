@@ -81,6 +81,13 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
+export const updateAuthUser = (updatedFields: Partial<User>) => {
+  const authStore = useAuthStore.getState();
+  const mergedUser = { ...authStore.user, ...updatedFields } as User;
+  useAuthStore.setState({ user: mergedUser });
+  localStorage.setItem('admin', JSON.stringify(mergedUser));
+};
+
 // Helper functions for auth
 // export const isAdmin = (user: User | null): boolean => {
 //   return user?.role === 'SuperAdmin' || user?.role === 'SubCityAdmin' || user?.role === 'Admin';

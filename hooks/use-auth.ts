@@ -63,6 +63,12 @@ export function useAuth() {
       return await adminApi.updateAdmin(formdata, token);
     },
   });
+  const selfUpdateAdminMutation = useMutation({
+    mutationFn: async (formdata: FormData) => {
+      if (!token) throw new Error('Authentication required');
+      return await adminApi.selfUpdateAdmin(formdata, token);
+    },
+  });
   const deleteAdminMutation = useMutation({
     mutationFn: async (id: string) => {
       if (!token) throw new Error('Authentication required');
@@ -118,6 +124,7 @@ export function useAuth() {
     getAdmins: getAdminMutation.data || [],
     createAdmin: createAdminMutation.mutateAsync,
     updateAdmin: updateAdminMutation.mutateAsync,
+    selfUpdateAdmin: selfUpdateAdminMutation.mutateAsync,
     isCreatingAdmin: createAdminMutation.isPending,
     createAdminError: createAdminMutation.error,
     deleteAdmin: deleteAdminMutation.mutateAsync || '',

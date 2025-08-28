@@ -765,6 +765,16 @@ export const adminApi = {
     });
     return handleResponse<{ message: string; admin: User }>(response);
   },
+  selfUpdateAdmin: async (formData: FormData, token: string) => {
+    const response = await fetch(`${API_BASE_URL}/admin/self-update`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    return handleResponse<{ message: string; admin: User }>(response);
+  },
   deleteAdmin: async (id: string, token: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/admin`, {

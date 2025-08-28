@@ -95,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const getUserInitials = () => {
     if (!user) return 'U';
-    return user.username.substring(0, 2).toUpperCase();
+    return user?.username?.substring(0, 2).toUpperCase();
   };
 
   const getRoleDisplay = () => {

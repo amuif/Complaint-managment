@@ -52,12 +52,13 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { useOrganization } from '@/hooks/use-organization';
+import { PICTURE_URL } from '@/constants/base_url';
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const pathname = usePathname();
   const { logout, user } = useAuth();
-  const {Subcities} =useOrganization()
+  const { Subcities } = useOrganization();
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
     { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
-    { name: t('systemSettings'), href: '/superadmin/settings', icon: Settings },
+    { name: 'Settings', href: '/superadmin/settings', icon: Settings },
   ];
 
   return (
@@ -134,16 +135,19 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                   <SidebarMenuSub>
+                    <SidebarMenuSub>
                       {Subcities.map((sub) => (
                         <SidebarMenuSubItem key={sub.id}>
                           <SidebarMenuSubButton
                             asChild
                             isActive={
-                              pathname === `/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`
+                              pathname ===
+                              `/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`
                             }
                           >
-                            <Link href={`/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`}>
+                            <Link
+                              href={`/superadmin/subcities/addis-ababa/${sub.name_en.toLowerCase().replace(/\s+/g, '-')}`}
+                            >
                               {sub.name_en}
                             </Link>
                           </SidebarMenuSubButton>
@@ -198,7 +202,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
                       <AvatarImage
-                        src="/placeholder.svg?height=36&width=36"
+                        src={`${PICTURE_URL}${user?.profile_picture}`}
                         alt={user?.username || 'Admin'}
                       />
                       <AvatarFallback>
