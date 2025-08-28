@@ -1,7 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { subcityApi } from '@/lib/api';
+import { Subcities } from '@/types/subcities';
 
 // Hook for subcity-specific employees
 export function useSubcityEmployees(subcity: string) {
@@ -20,6 +21,29 @@ export function useSubcityEmployees(subcity: string) {
   };
 }
 
+export function useSubcity() {
+  const createSubcityMutation = useMutation({
+    mutationFn: async (payload: Partial<Subcities>) => {
+      return subcityApi.crateSubcity(payload);
+    },
+  });
+  const updateSubcityMutation = useMutation({
+    mutationFn: async (payload: Partial<Subcities>) => {
+      return subcityApi.updateSubcity(payload);
+    },
+  });
+  const deleteSubcityMutation = useMutation({
+    mutationKey: ['delete subcity'],
+    mutationFn: async (id: string) => {
+      return subcityApi.deleteSubcity(id);
+    },
+  });
+  return {
+    createSubcity: createSubcityMutation.mutateAsync,
+    updateSubcity: updateSubcityMutation.mutateAsync,
+    deleteSubcity: deleteSubcityMutation.mutateAsync,
+  };
+}
 // Hook for subcity-specific complaints
 export function useSubcityComplaints(subcity: string) {
   const complaintsQuery = useQuery({

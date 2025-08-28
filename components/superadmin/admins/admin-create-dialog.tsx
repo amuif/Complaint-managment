@@ -1,6 +1,4 @@
 'use client';
-
-import type React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { adminRoles, User } from '@/types/user';
+import { adminRoles, type User } from '@/types/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useOrganization } from '@/hooks/use-organization';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
@@ -81,7 +79,7 @@ const userCreateSchema = z.object({
   city: z.string().min(1, 'City is required'),
   role: z.string(),
   subcity_id: z.string().min(1, 'Subcity is required'),
-  sector_id: z.string().min(1, 'Sector is required'),
+  sector_id: z.string().min(1, 'Sector is required').optional(),
   division_id: z.string().optional(),
   department_id: z.string().optional(),
   password: z.string().min(4, 'Password must be at least 4 characters'),
@@ -176,7 +174,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Admin</DialogTitle>
         </DialogHeader>
@@ -343,6 +341,13 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Organization</CardTitle>
+              <div className="text-sm text-muted-foreground bg-blue-50 p-3 rounded-md border-l-4 border-blue-400">
+                <p className="font-medium text-blue-800 mb-1">Admin Role Assignment:</p>
+                <p className="text-blue-700">
+                  If you create an admin with subcity only, they will be a subcity admin by default.
+                  However, if you add a sector, they will become an admin for that specific sector.
+                </p>
+              </div>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

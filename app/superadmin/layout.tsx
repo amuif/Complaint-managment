@@ -18,6 +18,7 @@ import {
   Building2,
   Star,
   UsersRound,
+  Building,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +78,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('allRatings'), href: '/superadmin/ratings', icon: Star },
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
     { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
+    { name: 'Subcities', href: '/superadmin/sections', icon: Building },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/superadmin/settings', icon: Settings },
   ];

@@ -1215,6 +1215,49 @@ export const ratingsApi = {
 
 // Subcity-specific API functions
 export const subcityApi = {
+  crateSubcity: async (subcity: Partial<Subcities>) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    const response = await fetch(`${API_BASE_URL}/admin/subcities`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(subcity),
+    });
+    return handleResponse<{ message: string; admin: User }>(response);
+  },
+  updateSubcity: async (subcity: Partial<Subcities>) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    const response = await fetch(`${API_BASE_URL}/admin/subcities`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(subcity),
+    });
+    return handleResponse<{ message: string; admin: User }>(response);
+  },
+  deleteSubcity: async (id: string) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    const response = await fetch(`${API_BASE_URL}/admin/subcities?id=${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return handleResponse<{ message: string; admin: User }>(response);
+  },
   // Get employees by subcity
   getEmployeesBySubcity: async (subcity: string) => {
     const params = new URLSearchParams();
