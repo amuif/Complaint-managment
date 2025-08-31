@@ -2,25 +2,25 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { publicApi, adminApi } from '@/lib/api';
-import { useLanguage } from '@/components/language-provider';
+import { useLanguage} from '@/components/language-provider';
 import { useAuthStore } from '@/lib/auth-store';
 
 export function useServices() {
-  const { lang } = useLanguage();
+  const { language} = useLanguage();
   const { token, isAuthenticated } = useAuthStore();
 
   // Get departments
   const departmentsQuery = useQuery({
-    queryKey: ['departments', lang],
-    queryFn: () => publicApi.getDepartments(lang),
+    queryKey: ['departments', language],
+    queryFn: () => publicApi.getDepartments(language),
   });
 
   // Get admin departments (if authenticated)
   const adminDepartmentsQuery = useQuery({
-    queryKey: ['adminDepartments', lang, isAuthenticated],
+    queryKey: ['adminDepartments', language, isAuthenticated],
     queryFn: () => {
       if (!token) throw new Error('Authentication required');
-      return adminApi.getDepartments(token, lang);
+      return adminApi.getDepartments(token, language);
     },
     enabled: isAuthenticated && !!token,
   });
@@ -34,13 +34,13 @@ export function useServices() {
 }
 
 export function useOffices(departmentId?: number) {
-  const { lang } = useLanguage();
+  const { language } = useLanguage();
 
   const officesQuery = useQuery({
-    queryKey: ['offices', departmentId, lang],
+    queryKey: ['offices', departmentId, language],
     queryFn: () => {
       if (!departmentId) throw new Error('Department ID required');
-      return publicApi.getOfficesByDepartment(departmentId, lang);
+      return publicApi.getOfficesByDepartment(departmentId, language);
     },
     enabled: !!departmentId,
   });
@@ -54,13 +54,13 @@ export function useOffices(departmentId?: number) {
 }
 
 export function useDepartmentEmployees(departmentId?: number) {
-  const { lang } = useLanguage();
+  const { language } = useLanguage();
 
   const employeesQuery = useQuery({
-    queryKey: ['departmentEmployees', departmentId, lang],
+    queryKey: ['departmentEmployees', departmentId, language],
     queryFn: () => {
       if (!departmentId) throw new Error('Department ID required');
-      return publicApi.getEmployeesByDepartment(departmentId, lang);
+      return publicApi.getEmployeesByDepartment(departmentId, language);
     },
     enabled: !!departmentId,
   });

@@ -11,6 +11,7 @@ import { Department } from '@/types/department';
 import { Subcities } from '@/types/subcities';
 import { Feedback } from '@/types/feedback';
 import { User } from '@/types/user';
+import { ActivityLog } from '@/types/notifications';
 
 // Base API configuration and helper functions
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend.torobingo.com/api'; // || 'http://196.189.93.235:4000/api';
@@ -450,7 +451,14 @@ export const adminApi = {
     return handleResponse<{ message: string; admin: User }>(response);
   },
 
-  // Employee management
+  notifications: {
+    getAll: async (token: string): Promise<ActivityLog[]> => {
+      const response = await fetch(`${API_BASE_URL}/admin/notifications`, {
+        headers: getAuthHeaders(token),
+      });
+      return handleResponse<ActivityLog[]>(response);
+    },
+  }, // Employee management
   employees: {
     getAll: async (token: string, lang?: string): Promise<Employee[]> => {
       const response = await fetch(withLang(`${API_BASE_URL}/admin/employees`, lang), {
