@@ -21,7 +21,16 @@ import {
   Building,
   Shield,
 } from 'lucide-react';
-
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -40,6 +49,8 @@ import {
 import { PageLoader } from '@/components/ui/loader';
 import { adminRoles } from '@/types/user';
 import { PICTURE_URL } from '@/constants/base_url';
+import { ActivityLog } from '@/types/notifications';
+import { useNotifications } from '@/hooks/use-notifications';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
@@ -47,6 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { logout, user } = useAuth();
+  const { Notifications } = useNotifications();
 
   const getNavigation = () => {
     const baseNavigation = [
@@ -305,6 +317,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {/* </Button> */}
               {/* <LanguageToggle /> */}
               <ThemeToggle />
+                          <div className="flex items-center gap-4">
+              <Drawer direction="right">
+                <DrawerTrigger>
+                  <Bell className="h-4 w-4" />
+                  <span className="sr-only">Notifications</span>
+                </DrawerTrigger>
+                <DrawerContent className="h-screen w-[30%] ml-auto border-l bg-background">
+                  <DrawerHeader className="flex items-center justify-between border-b px-4 py-3">
+                    <DrawerTitle className="text-lg font-semibold">Notifications</DrawerTitle>
+                    {Notifications.length > 0 && (
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        {Notifications.length} new
+                      </span>
+                    )}
+                  </DrawerHeader>
+                  <div className="flex-1 p-4 overflow-y-auto">
+                    {Notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="p-3 border-b border-gray-200 last:border-b-0"
+                      >
+                        <p className="text-sm ">{generateNotificationMessage(notification)}</p>
+                        <p className="text-xs  mt-1">
+                          {new Date(notification.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                    {Notifications.length === 0 && (
+                      <p className="text-center text-gray-500 py-4">No notifications</p>
+                    )}
+                  </div>
+                </DrawerContent>
+              </Drawer>{' '}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage
+                        src={`${PICTURE_URL}${user?.profile_picture}`}
+                        alt={user?.username || 'Admin'}
+                      />
+                      <AvatarFallback>
+                        {user?.username?.slice(0, 2).toUpperCase() || 'SA'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{user?.username || t('superAdmin')}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>{t('logout')}</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
             </div>
           </header>
 
@@ -316,4 +383,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     </div>
   );
+}
+const generateNotificationMessage = (notification: ActivityLog) => {
+  const { action, entity_type, entity_id, admin_id } = notification;
+
+  const entityName = entity_type.charAt(0).toUpperCase() + entity_type.slice(1);
+  const actionText = action.toLowerCase();
+
+  const actor = admin_id ? `Admin ${notification.resolver.username}` : 'System';
+
+  switch (action) {
+    case 'CREATE':
+      return `${actor} created a new ${entityName}`;
+
+    case 'UPDATE':
+      return `${actor} updated ${entityName} `;
+
+    case 'DELETE':
+      return `${actor} deleted ${entityName}`;
+
+    default:
+      return `${actor} performed ${actionText} on ${entityName} #${entity_id}`;
+  }
 }

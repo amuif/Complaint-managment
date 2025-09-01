@@ -228,7 +228,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                         key={notification.id}
                         className="p-3 border-b border-gray-200 last:border-b-0"
                       >
-                        <p className="text-sm ">{generateNotificationMessage(notification)}</p>
+                        <p className="text-sm capitalize ">{generateNotificationMessage(notification)}</p>
                         <p className="text-xs  mt-1">
                           {new Date(notification.created_at).toLocaleString()}
                         </p>
@@ -275,9 +275,7 @@ const generateNotificationMessage = (notification: ActivityLog) => {
 
   const entityName = entity_type.charAt(0).toUpperCase() + entity_type.slice(1);
   const actionText = action.toLowerCase();
-
-  const actor = admin_id ? `Admin #${admin_id}` : 'System';
-
+  const actor = admin_id ? `Admin ${notification.resolver.username}` : 'System';
   switch (action) {
     case 'CREATE':
       return `${actor} created a new ${entityName}`;

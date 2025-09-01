@@ -132,7 +132,7 @@ export default function DashboardPage() {
 
         <Card className="sleek-card border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalFeedback')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Total feedback</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
           </CardHeader>
           <CardContent>

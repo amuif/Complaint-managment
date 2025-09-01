@@ -149,7 +149,6 @@ export default function SystemSettingsPage() {
       const response = await selfUpdateAdmin(formData);
       handleApiSuccess(response.message);
       updateAuthUser(response.admin);
-      console.log('ew ', response.admin);
       setProfilePictureFile(null);
       reset();
     } catch (error) {
