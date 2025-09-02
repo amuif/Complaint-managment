@@ -24,8 +24,7 @@ export function RecentActivitySuperAdmin() {
       activities.push({
         id: `complaint-${complaint.id}`,
         type: 'complaint',
-        title: `New Complaint #${complaint.tracking_code}`,
-        description: `Department: ${complaint.department} • Section: ${complaint.section}`,
+        title: `New Complaint #${complaint.phone_number}`,
         time: format(parseISO(complaint.created_at), 'MMM dd, HH:mm'),
         status: complaint.status || 'Open',
         icon: MessageSquare,
@@ -42,8 +41,7 @@ export function RecentActivitySuperAdmin() {
       activities.push({
         id: `public-complaint-${complaint.id}`,
         type: 'complaint',
-        title: `Public Complaint #${complaint.tracking_code}`,
-        description: `Department: ${complaint.department} • Section: ${complaint.section}`,
+        title: `Public Complaint #${complaint.phone_number}`,
         time: format(parseISO(complaint.created_at), 'MMM dd, HH:mm'),
         status: complaint.status || 'Open',
         icon: MessageSquare,
@@ -61,7 +59,6 @@ export function RecentActivitySuperAdmin() {
         id: `feedback-${fb.id}`,
         type: 'feedback',
         title: 'New Feedback Received',
-        description: `Section: ${fb.section} • Rating: ${fb.rating || 'N/A'}/5`,
         time: format(parseISO(fb.created_at), 'MMM dd, HH:mm'),
         status: 'New',
         icon: FileText,
@@ -75,13 +72,13 @@ export function RecentActivitySuperAdmin() {
   // Add recent ratings
   if (ratings) {
     ratings.slice(0, 2).forEach((rating) => {
-      const avgRating = ((rating.courtesy + rating.timeliness + rating.knowledge) / 3).toFixed(1);
+      const avgRating = ((rating.courtesy + rating.punctuality+ rating.knowledge) / 3).toFixed(1);
       activities.push({
         id: `rating-${rating.id}`,
         type: 'rating',
         title: 'New Service Rating',
         description: `Employee: ${
-          rating.Employee?.employee_name || 'Unknown'
+          rating.Employee?.first_name_en|| 'Unknown'
         } • Avg: ${avgRating}/5`,
         time: format(parseISO(rating.created_at), 'MMM dd, HH:mm'),
         status:
