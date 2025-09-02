@@ -148,7 +148,9 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
   });
 
   const profilePicture = watch('profile_picture');
-
+  useEffect(() => {
+    console.log('Form errors:', errors);
+  }, [errors]);
   const onSubmit = async (formData: EmployeeFormData) => {
     try {
       const payload = new FormData();
@@ -283,7 +285,6 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                         const sector = Sectors.find((s) => String(s.id) === val) || null;
                         setSelectedSector(sector);
                       }}
-                      // disabled={}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={selectedSector?.name_en ?? 'Select Sector'} />

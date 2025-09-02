@@ -317,61 +317,62 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {/* </Button> */}
               {/* <LanguageToggle /> */}
               <ThemeToggle />
-                          <div className="flex items-center gap-4">
-              <Drawer direction="right">
-                <DrawerTrigger>
-                  <Bell className="h-4 w-4" />
-                  <span className="sr-only">Notifications</span>
-                </DrawerTrigger>
-                <DrawerContent className="h-screen w-[30%] ml-auto border-l bg-background">
-                  <DrawerHeader className="flex items-center justify-between border-b px-4 py-3">
-                    <DrawerTitle className="text-lg font-semibold">Notifications</DrawerTitle>
-                    {Notifications.length > 0 && (
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                        {Notifications.length} new
-                      </span>
-                    )}
-                  </DrawerHeader>
-                  <div className="flex-1 p-4 overflow-y-auto">
-                    {Notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="p-3 border-b border-gray-200 last:border-b-0"
-                      >
-                        <p className="text-sm ">{generateNotificationMessage(notification)}</p>
-                        <p className="text-xs  mt-1">
-                          {new Date(notification.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    ))}
-                    {Notifications.length === 0 && (
-                      <p className="text-center text-gray-500 py-4">No notifications</p>
-                    )}
-                  </div>
-                </DrawerContent>
-              </Drawer>{' '}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage
-                        src={`${PICTURE_URL}${user?.profile_picture}`}
-                        alt={user?.username || 'Admin'}
-                      />
-                      <AvatarFallback>
-                        {user?.username?.slice(0, 2).toUpperCase() || 'SA'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>{user?.username || t('superAdmin')}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>{t('logout')}</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
+              <div className="flex items-center gap-4">
+                <Drawer direction="right">
+                  <DrawerTrigger>
+                    <Bell className="h-4 w-4" />
+                    <span className="sr-only">Notifications</span>
+                  </DrawerTrigger>
+                  <DrawerContent className="h-screen w-[30%] ml-auto border-l bg-background">
+                    <DrawerHeader className="flex items-center justify-between border-b px-4 py-3">
+                      <DrawerTitle className="text-lg font-semibold">Notifications</DrawerTitle>
+                      {Notifications.length > 0 && (
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          {Notifications.length} new
+                        </span>
+                      )}
+                    </DrawerHeader>
+                    <div className="flex-1 p-4 overflow-y-auto">
+                      {Notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="p-3 border-b border-gray-200 last:border-b-0"
+                        >
+                          <p className="text-sm ">{generateNotificationMessage(notification)}</p>
+                          <p className="text-xs  mt-1">
+                            {new Date(notification.created_at).toLocaleString()}
+                          </p>
+                        </div>
+                      ))}
+                      {Notifications.length === 0 && (
+                        <p className="text-center text-gray-500 py-4">No notifications</p>
+                      )}
+                    </div>
+                  </DrawerContent>
+                </Drawer>{' '}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={`${PICTURE_URL}${user?.profile_picture}`}
+                          alt={user?.username || 'Admin'}
+                        />
+                        <AvatarFallback>
+                          {user?.username?.slice(0, 2).toUpperCase() || 'SA'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel className="capitalize">
+                      {user?.username || t('superAdmin')}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>{t('logout')}</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </header>
 
@@ -405,4 +406,4 @@ const generateNotificationMessage = (notification: ActivityLog) => {
     default:
       return `${actor} performed ${actionText} on ${entityName} #${entity_id}`;
   }
-}
+};

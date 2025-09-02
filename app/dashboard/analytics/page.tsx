@@ -144,13 +144,13 @@ export default function SuperAdminAnalyticsPage() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            {t('systemAnalytics') || 'System Analytics'}
+            System Analytics
           </h2>
         </div>
         <div className="flex items-center gap-2">
           {memoizedSubcities.length === 0 ? (
             <div className="text-gray-500">
-              {t('noSubcitiesAvailable') || 'No subcities available'}
+              No subcities available
             </div>
           ) : (
             <Select
@@ -159,10 +159,10 @@ export default function SuperAdminAnalyticsPage() {
               disabled={memoizedSubcities.length === 0}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('selectRegion') || 'Select Region'} />
+                <SelectValue placeholder= 'Select Region'/>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('allRegions') || 'All Regions'}</SelectItem>
+                <SelectItem value="all"> 'All Regions'</SelectItem>
                 {memoizedSubcities.map((subcity) => (
                   <SelectItem key={subcity.id} value={subcity.id.toString()}>
                     {subcity.name_en}
@@ -180,7 +180,7 @@ export default function SuperAdminAnalyticsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('totalEmployees') || 'Total Employees'}
+              Total Employees
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -190,7 +190,7 @@ export default function SuperAdminAnalyticsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('totalRatings') || 'Total Ratings'}
+               Total Ratings
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -200,7 +200,7 @@ export default function SuperAdminAnalyticsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('totalComplaints') || 'Total Complaints'}
+              Total Complaints
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -210,7 +210,7 @@ export default function SuperAdminAnalyticsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('totalFeedback') || 'Total Feedback'}
+              Total Feedback
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -222,20 +222,20 @@ export default function SuperAdminAnalyticsPage() {
       {/* Charts */}
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">{t('overview') || 'Overview'}</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 grid-cols-1">
             <Card>
               <CardHeader>
-                <CardTitle>{t('complaintDistribution') || 'Complaint Distribution'}</CardTitle>
-                <CardDescription>{t('byRegion') || 'By Region'}</CardDescription>
+                <CardTitle>Complaint Distribution</CardTitle>
+                <CardDescription>By Region</CardDescription>
               </CardHeader>
 
               <CardContent>
                 {complaintData.length === 0 ? (
                   <div className="text-center text-gray-500">
-                    {t('noDataAvailable') || 'No data available'}
+                    No data available
                   </div>
                 ) : (
                   <BarChart data={complaintData} xAxisKey="name" yAxisKey="value" height={400} />

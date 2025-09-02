@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Search, Plus, Download, Filter } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/components/language-provider';
 import {
@@ -11,7 +10,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -21,7 +19,6 @@ import { EmployeeAnalytics } from '@/components/superadmin/employee-analytics';
 import { AddEmployeeDialog } from '@/components/superadmin/add-employee-dialog';
 import { ExportDialog } from '@/components/superadmin/export-dialog';
 import { useOrganization } from '@/hooks/use-organization';
-import { useAuthStore } from '@/lib/auth-store';
 
 export default function AllAdminEmployeesPage() {
   const { t } = useLanguage();
