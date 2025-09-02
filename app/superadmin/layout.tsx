@@ -177,19 +177,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
-
-          <SidebarFooter className="border-t p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
-              <Button variant="outline" size="icon" onClick={handleLogout}>
-                <LogOut className="h-5 w-5" />
-                <span className="sr-only">{t('logout')}</span>
-              </Button>
-            </div>
-          </SidebarFooter>
         </Sidebar>
 
         {/* Main Content */}
@@ -199,15 +186,9 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             <div className="flex items-center gap-4">
               {/* Sidebar Trigger for collapse/expand */}
               <SidebarTrigger className="md:inline-flex" />
-              <div className="relative w-64">
-                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder={t('search')}
-                  className="h-9 w-full rounded-full border-0 bg-muted/50 pl-8 focus-visible:ring-1"
-                />
-              </div>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Drawer direction="right">
                 <DrawerTrigger>
                   <Bell className="h-4 w-4" />
@@ -228,7 +209,9 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                         key={notification.id}
                         className="p-3 border-b border-gray-200 last:border-b-0"
                       >
-                        <p className="text-sm capitalize ">{generateNotificationMessage(notification)}</p>
+                        <p className="text-sm capitalize ">
+                          {generateNotificationMessage(notification)}
+                        </p>
                         <p className="text-xs  mt-1">
                           {new Date(notification.created_at).toLocaleString()}
                         </p>

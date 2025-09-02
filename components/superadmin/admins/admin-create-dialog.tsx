@@ -27,6 +27,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/lib/auth-store';
 import { useEffect, useState } from 'react';
+import { Division } from '@/types/division';
+import { Department } from '@/types/department';
 
 const roleHierarchy = [
   adminRoles.SuperAdmin,
@@ -65,7 +67,6 @@ function getCreatableRoles(currentRole: adminRoles | string | undefined): adminR
     console.log('Invalid role:', roleNumber);
     return [];
   }
-  console.log('Creatable roles for', roleNumber, ':', roleHierarchy.slice(index + 1));
   return roleHierarchy.slice(index + 1);
 }
 
@@ -99,6 +100,10 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
   const { Sectors, Directors, Teams, Subcities } = useOrganization();
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [userError, setUserError] = useState<string | null>(null);
+  const [filteredDirectors, setFilteredDirectors] = useState<Division[]>([]);
+  const [filteredTeams, setFilteredTeams] = useState<Department[]>([]);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [selectedDirector, setSelectedDirector] = useState<string | null>(null);
 
   useEffect(() => {
     if (user !== undefined) {
@@ -111,6 +116,12 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
     }
   }, [user]);
 
+  useEffect(() => {
+    const filteredDirectors = Directors.filter((director) => director.sector_id == selectedSector);
+    const filteredTeams = Teams.filter((team) => team.division_id == selectedDirector?.toString());
+    setFilteredDirectors(filteredDirectors);
+    setFilteredTeams(filteredTeams);
+  }, [selectedSector, selectedDirector]);
   const {
     register,
     handleSubmit,
@@ -379,7 +390,13 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                   name="sector_id"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setSelectedSector(value);
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Sectors" />
                       </SelectTrigger>
@@ -403,12 +420,18 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                   name="division_id"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setSelectedDirector(value);
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Directors" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Directors.map((d) => (
+                        {filteredDirectors.map((d) => (
                           <SelectItem key={d.id} value={d.id.toString()}>
                             {d.name_en}
                           </SelectItem>
@@ -432,7 +455,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                         <SelectValue placeholder="Teams" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Teams.map((t) => (
+                        {filteredTeams.map((t) => (
                           <SelectItem key={t.id} value={t.id.toString()}>
                             {t.name_en}
                           </SelectItem>

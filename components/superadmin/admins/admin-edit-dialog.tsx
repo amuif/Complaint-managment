@@ -25,6 +25,8 @@ import { handleApiSuccess, handleApiError } from '@/lib/error-handler';
 import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PICTURE_URL } from '@/constants/base_url';
+import { Division } from '@/types/division';
+import { Department } from '@/types/department';
 
 const userUpdateSchema = z.object({
   first_name: z.string().min(1, 'First name is required').nullable(),
@@ -92,6 +94,10 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
   const { updateAdmin } = useAuth();
   const { Sectors, Directors, Teams, Subcities } = useOrganization();
   const [creatableRoles, setCreatableRoles] = useState<adminRoles[]>([]);
+  const [filteredDirectors, setFilteredDirectors] = useState<Division[]>([]);
+  const [filteredTeams, setFilteredTeams] = useState<Department[]>([]);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [selectedDirector, setSelectedDirector] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.role != null) {
@@ -101,6 +107,12 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
     console.log(user);
   }, [user]);
 
+  useEffect(() => {
+    const filteredDirectors = Directors.filter((director) => director.sector_id == selectedSector);
+    const filteredTeams = Teams.filter((team) => team.division_id == selectedDirector?.toString());
+    setFilteredDirectors(filteredDirectors);
+    setFilteredTeams(filteredTeams);
+  }, [selectedSector, selectedDirector]);
   const [formState, setFormState] = useState<Partial<User>>({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -180,6 +192,7 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
 
       await updateAdmin(formData);
       handleApiSuccess('Admin updated successfully');
+      onOpenChange(false);
     } catch (err: unknown) {
       if (err instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -218,7 +231,7 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
   return (
     user && (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
@@ -409,7 +422,10 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
                 <Label htmlFor="sector_id">Sector</Label>
                 <Select
                   value={formState.sector_id?.toString()}
-                  onValueChange={(value) => handleSelectChange('sector_id', value.toString())}
+                  onValueChange={(value) => {
+                    setSelectedSector(value);
+                    handleSelectChange('sector_id', value.toString());
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Sector" />
@@ -427,13 +443,16 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
                 <Label htmlFor="division_id">Division</Label>
                 <Select
                   value={formState.division_id?.toString()}
-                  onValueChange={(value) => handleSelectChange('division_id', value)}
+                  onValueChange={(value) => {
+                    setSelectedDirector(value);
+                    handleSelectChange('division_id', value);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Division" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Directors.map((d) => (
+                    {filteredDirectors.map((d) => (
                       <SelectItem key={d.id} value={d.id.toString()}>
                         {d.name_en}
                       </SelectItem>
@@ -451,7 +470,7 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
                     <SelectValue placeholder="Select Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Teams.map((t) => (
+                    {filteredTeams.map((t) => (
                       <SelectItem key={t.id} value={t.id.toString()}>
                         {t.name_en}
                       </SelectItem>
