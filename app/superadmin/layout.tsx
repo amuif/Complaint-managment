@@ -275,7 +275,7 @@ const generateNotificationMessage = (notification: ActivityLog) => {
 
   const entityName = entity_type.charAt(0).toUpperCase() + entity_type.slice(1);
   const actionText = action.toLowerCase();
-  const actor = admin_id ? `Admin ${notification.resolver.username}` : 'System';
+  const actor = admin_id ? `Admin ${notification.admin.username}` : 'System';
   switch (action) {
     case 'CREATE':
       return `${actor} created a new ${entityName}`;

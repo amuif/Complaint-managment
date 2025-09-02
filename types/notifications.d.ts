@@ -8,7 +8,7 @@ export interface ActivityLog {
   sector_id: number;
   subcity_id: number;
   created_at: string;
-  resolver: Resolver;
+  admin: Resolver;
   sector: Sector;
   subcity: Subcity;
 }

@@ -22,6 +22,7 @@ import { ExportDialog } from '@/components/superadmin/export-dialog';
 import { ComplaintViewDialog } from '@/components/superadmin/complaint-management/complaint-view-dialog';
 import { ComplaintEditDialog } from '@/components/superadmin/complaint-management/complaint-edit-dialog';
 import { Complaint } from '@/types/complaint';
+import { useOrganization } from '@/hooks/use-organization';
 
 export default function ComplaintsPage() {
   const { t } = useLanguage();
@@ -29,6 +30,7 @@ export default function ComplaintsPage() {
   const [regionFilter, setRegionFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewType, setViewType] = useState('list');
+  const { Subcities } = useOrganization();
 
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(null);
@@ -75,11 +77,11 @@ export default function ComplaintsPage() {
                 <SelectGroup>
                   <SelectLabel>{t('region')}</SelectLabel>
                   <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="addis-ababa">Addis Ababa</SelectItem>
-                  <SelectItem value="amhara">Amhara</SelectItem>
-                  <SelectItem value="oromia">Oromia</SelectItem>
-                  <SelectItem value="tigray">Tigray</SelectItem>
-                  <SelectItem value="snnpr">SNNPR</SelectItem>
+                  {Subcities.map((subcity, index) => (
+                    <SelectItem value={subcity.id} key={index}>
+                      {subcity.name_en}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>

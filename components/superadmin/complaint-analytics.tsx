@@ -3,9 +3,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/components/language-provider';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Badge } from '@/components/ui/badge';
+import { useOrganization } from '@/hooks/use-organization';
 
 interface ComplaintAnalyticsProps {
   regionFilter: string;
@@ -17,6 +18,7 @@ export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnal
   const [chartType, setChartType] = useState('status');
 
   const { complaints, publicComplaints, isLoading } = useComplaints();
+  const { Subcities } = useOrganization();
 
   // Combine both complaint sources
   const allComplaints = [
@@ -32,37 +34,22 @@ export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnal
       (statusFilter === 'open' && complaint.status?.toLowerCase() === 'pending') ||
       (statusFilter === 'in-progress' && complaint.status?.toLowerCase() === 'in progress');
 
+    const currentSubcity = Subcities.find((subcity) => subcity.id === regionFilter);
     const matchesRegion =
       regionFilter === 'all' ||
-      complaint.section?.toLowerCase().includes(regionFilter.toLowerCase()) ||
-      complaint.department?.toLowerCase().includes(regionFilter.toLowerCase());
+      complaint.sub_city.name_en?.toLowerCase().includes(currentSubcity?.name_en.toLowerCase()!);
 
     return matchesStatus && matchesRegion;
   });
+  useEffect(() => {
+    console.log('region', regionFilter);
+  }, [regionFilter]);
 
   // Calculate analytics
   const statusCounts = filteredComplaints.reduce(
     (acc, complaint) => {
       const status = complaint.status || 'Unknown';
       acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  const departmentCounts = filteredComplaints.reduce(
-    (acc, complaint) => {
-      const dept = complaint.department || 'Unknown';
-      acc[dept] = (acc[dept] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  const sectionCounts = filteredComplaints.reduce(
-    (acc, complaint) => {
-      const section = complaint.section || 'Unknown';
-      acc[section] = (acc[section] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>
@@ -117,78 +104,11 @@ export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnal
         </div>
       );
     }
-
-    if (chartType === 'region') {
-      return (
-        <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(departmentCounts)
-              .slice(0, 6)
-              .map(([dept, count]) => (
-                <Card key={dept} className="text-center">
-                  <CardContent className="pt-6">
-                    <div className="text-2xl font-bold mb-2">{count}</div>
-                    <p className="text-sm font-medium">{dept}</p>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-          {Object.keys(departmentCounts).length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No departments found matching the current filters
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (chartType === 'priority') {
-      return (
-        <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(sectionCounts)
-              .slice(0, 6)
-              .map(([section, count]) => (
-                <Card key={section} className="text-center">
-                  <CardContent className="pt-6">
-                    <div className="text-2xl font-bold mb-2">{count}</div>
-                    <p className="text-sm font-medium">{section}</p>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-          {Object.keys(sectionCounts).length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No sections found matching the current filters
-            </div>
-          )}
-        </div>
-      );
-    }
   };
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden border-none shadow-md">
-        <CardHeader>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle>Complaint Analytics</CardTitle>
-              <CardDescription>Comprehensive analysis of complaint data</CardDescription>
-            </div>
-            <Tabs defaultValue={chartType} onValueChange={setChartType} className="w-[300px]">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="status">By Status</TabsTrigger>
-                <TabsTrigger value="region">By Department</TabsTrigger>
-                <TabsTrigger value="priority">By Section</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </CardHeader>
-        <CardContent>{renderChart()}</CardContent>
-      </Card>
-
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 ">
         <Card className="overflow-hidden border-none shadow-md">
           <CardHeader>
             <CardTitle>Summary Statistics</CardTitle>
@@ -207,9 +127,9 @@ export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnal
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Pending:</span>
+                <span className="text-sm font-medium">Submitted:</span>
                 <span className="text-lg font-semibold text-yellow-600">
-                  {filteredComplaints.filter((c) => c.status?.toLowerCase() === 'pending').length}
+                  {filteredComplaints.filter((c) => c.status?.toLowerCase() === 'submitted').length}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -234,29 +154,6 @@ export function ComplaintAnalytics({ regionFilter, statusFilter }: ComplaintAnal
                     : '0%'}
                 </span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden border-none shadow-md">
-          <CardHeader>
-            <CardTitle>Top Departments</CardTitle>
-            <CardDescription>Departments with most complaints</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {Object.entries(departmentCounts)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 5)
-                .map(([dept, count]) => (
-                  <div key={dept} className="flex justify-between items-center">
-                    <span className="text-sm font-medium truncate pr-2">{dept}</span>
-                    <Badge variant="secondary">{count}</Badge>
-                  </div>
-                ))}
-              {Object.keys(departmentCounts).length === 0 && (
-                <div className="text-center py-4 text-muted-foreground">No data available</div>
-              )}
             </div>
           </CardContent>
         </Card>
