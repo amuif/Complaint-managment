@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { employeesApi, subcityApi } from '@/lib/api';
-import { Employee, EmployeeFiltersTypes } from '@/types/employee';
 import { useAuthStore } from '@/lib/auth-store';
 
 export function useEmployees() {
@@ -13,7 +12,8 @@ export function useEmployees() {
     queryKey: ['get-employees'],
     queryFn: () => {
       if (!token) throw new Error('Authentication required');
-      return employeesApi.getEmployees();
+      const response = employeesApi.getEmployees();
+      return response;
     },
   });
 

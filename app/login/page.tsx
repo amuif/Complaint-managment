@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/components/language-provider';
 import { LanguageToggle } from '@/components/language-toggle';
@@ -17,7 +16,6 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const { login, isLoggingIn, loginError, clearError } = useAuth();
   const { t } = useLanguage();
 

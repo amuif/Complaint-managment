@@ -27,10 +27,6 @@ export default function AllAdminEmployeesPage() {
   const [regionFilter, setRegionFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [viewType, setViewType] = useState('list');
-  useEffect(() => {
-    console.log(DirectorsBySector);
-  }, [DirectorsBySector]);
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -53,9 +49,7 @@ export default function AllAdminEmployeesPage() {
       </div>
 
       {/* Filters and Tabs */}
-      <Tabs defaultValue={viewType} onValueChange={setViewType} className="w-full">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative flex-1">
+      <Tabs defaultValue={viewType} onValueChange={setViewType} className="w-full"> <div className="flex flex-col gap-4 md:flex-row md:items-center"> <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t('searchEmployees')}

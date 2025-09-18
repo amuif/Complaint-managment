@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api';
-import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 import { adminRoles } from '@/types/user';
 
 export function useAuth() {

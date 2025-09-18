@@ -23,7 +23,7 @@ export function FeedbackList({ searchQuery, dateRange, type }: FeedbackTableProp
 
   useEffect(() => {
     if (publicFeedback) {
-      console.log(publicFeedback.feedback)
+      console.log("pubclic",publicFeedback)
     }
   }, [publicFeedback])
 
@@ -78,7 +78,7 @@ export function FeedbackList({ searchQuery, dateRange, type }: FeedbackTableProp
     )
   }
 
-  const allFeedback = [...(publicFeedback?.feedback || [])].sort(
+  const allFeedback = [...(publicFeedback || [])].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
 

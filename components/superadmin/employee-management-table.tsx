@@ -59,7 +59,7 @@ export function EmployeeManagementTable({
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
 
   useEffect(() => {
-    console.log(employees);
+    console.log('employees', employees);
   }, [employees]);
 
   const [page, setPage] = useState(1);

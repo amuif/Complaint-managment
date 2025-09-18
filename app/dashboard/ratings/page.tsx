@@ -14,14 +14,18 @@ import { useRatings } from '@/hooks/use-ratings';
 import { Rating } from '@/types/rating';
 
 export default function RatingsPage() {
-  const { ratings, publicRatings, isLoading, isError } = useRatings();
+  const {  publicRatings, isLoading, isError } = useRatings();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: addDays(new Date(), -30),
     to: new Date(),
   });
-  const allRatings = [...(ratings || []), ...(publicRatings || [])];
+
+  useEffect(()=>{
+    console.log(publicRatings)
+  },[publicRatings])
+
   const getAverageRating = (ratings: Rating[]): string => {
     if (ratings.length === 0) return '0.0';
 
@@ -31,6 +35,7 @@ export default function RatingsPage() {
 
     return (total / ratings.length).toFixed(1);
   };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
@@ -65,8 +70,8 @@ export default function RatingsPage() {
                 <CardDescription>{t('overallAverageRating')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{getAverageRating(allRatings)}</div>
-                <p className="text-sm text-muted-foreground">out of {allRatings.length}</p>
+                <div className="text-4xl font-bold">{getAverageRating(publicRatings)}</div>
+                <p className="text-sm text-muted-foreground">out of {publicRatings.length}</p>
               </CardContent>
             </Card>
             <Card>
@@ -74,7 +79,7 @@ export default function RatingsPage() {
                 <CardTitle>Total ratings</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{allRatings.length}</div>
+                <div className="text-4xl font-bold">{publicRatings.length}</div>
               </CardContent>
             </Card>
           </div>
@@ -82,8 +87,7 @@ export default function RatingsPage() {
         <TabsContent value="details" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('ratingDetails')}</CardTitle>
-              <CardDescription>{t('allRatingsDetails')}</CardDescription>
+              <CardTitle>Rating details</CardTitle>
             </CardHeader>
             <CardContent>
               <RatingsTable searchQuery={searchQuery} dateRange={dateRange} />

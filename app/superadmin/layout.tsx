@@ -74,9 +74,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const { Subcities } = useOrganization();
   const { Notifications } = useNotifications();
 
-  useEffect(() => {
-    console.log(Notifications);
-  }, [Notifications]);
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     logout();
@@ -94,7 +91,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     { name: t('allRatings'), href: '/superadmin/ratings', icon: Star },
     { name: t('Organization'), href: '/superadmin/organization', icon: Building2 },
     { name: t('Admins'), href: '/superadmin/admins', icon: UsersRound },
-    { name: 'Subcities', href: '/superadmin/sections', icon: Building },
+    { name: 'Branches', href: '/superadmin/sections', icon: Building },
     { name: t('analytics'), href: '/superadmin/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/superadmin/settings', icon: Settings },
   ];
@@ -148,7 +145,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             {/* Sub Cities Category */}
             <SidebarGroup>
               <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
-                Sub Cities
+                Branches
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>

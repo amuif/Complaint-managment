@@ -315,6 +315,7 @@ export const publicApi = {
 export const adminApi = {
   // Authentication
   login: async (credentials: { username: string; password: string }): Promise<AuthResponse> => {
+    console.log(credentials);
     const response = await fetch(`${API_BASE_URL}/admin/login`, {
       method: 'POST',
       headers: {
@@ -667,11 +668,11 @@ export const adminApi = {
     }
   },
 
-  getPublicFeedback: async (token: string, lang?: string): Promise<ApiFeedbackResponse> => {
-    const response = await fetch(withLang(`${API_BASE_URL}/admin/public/feedback`, lang), {
+  getPublicFeedback: async (token: string, lang?: string): Promise<Feedback[]> => {
+    const response = await fetch(withLang(`${API_BASE_URL}/admin/feedback`, lang), {
       headers: getAuthHeaders(token),
     });
-    return handleDataResponse<ApiFeedbackResponse>(response);
+    return handleResponse<Feedback[]>(response);
   },
 
   // Get feedback filtered by subcity
@@ -1051,7 +1052,6 @@ export const employeesApi = {
   },
 
   createEmployee: async (token: string, formData: FormData) => {
-    console.log(formData);
     return apiRequest('/admin/employees', {
       headers: {
         // 'Content-Type': 'multipart/form-data',

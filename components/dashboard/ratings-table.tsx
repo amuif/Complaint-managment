@@ -16,7 +16,7 @@ interface RatingsTableProps {
 }
 
 export function RatingsTable({ searchQuery, dateRange }: RatingsTableProps) {
-  const { ratings, publicRatings, isLoading, isError } = useRatings()
+  const {  publicRatings, isLoading, isError } = useRatings()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
@@ -72,7 +72,7 @@ export function RatingsTable({ searchQuery, dateRange }: RatingsTableProps) {
   }
 
   // Combine both rating sources
-  const allRatings = [...(ratings || []), ...(publicRatings || [])]
+  const allRatings =publicRatings 
 
   // Filter ratings based on searchQuery and dateRange
   const filteredRatings = allRatings
