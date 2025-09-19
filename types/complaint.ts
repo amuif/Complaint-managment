@@ -44,6 +44,7 @@ export interface Complaint {
   complaint_type?: 'service_quality' | 'staff_behavior' | 'facility' | 'other' | null;
 
   voice_note?: string | null;
+  attachment?: Attachment;
 
   status: 'submitted' | 'under review' | 'investigating' | 'resolved' | 'closed';
 
@@ -72,4 +73,10 @@ export interface Complaint {
     action: string;
     by: string;
   }[];
+}
+export interface Attachment {
+  file_path: string;
+  file_type: string;
+  id: string;
+  uploaded_at: string;
 }

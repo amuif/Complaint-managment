@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   Clock,
   HelpCircle,
-  MessageCircle,
   Send,
 } from 'lucide-react';
 import {

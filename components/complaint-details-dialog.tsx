@@ -14,8 +14,12 @@ import {
   CheckCircle,
   FileText,
   Users,
+  Download,
+  File,
+  ImageIcon,
 } from 'lucide-react';
 import { Complaint } from '@/types/complaint';
+import { Button } from '@/components/ui/button';
 
 interface ComplaintDetailsDialogProps {
   openDetails: {
@@ -27,14 +31,15 @@ interface ComplaintDetailsDialogProps {
 }
 
 const API_VOICE_URL = process.env.NEXT_PUBLIC_AUDIO_URL || 'https://backend.torobingo.com';
+
 export function ComplaintDetailsDialog({
   openDetails,
   setOpenDetails,
   formatDate,
 }: ComplaintDetailsDialogProps) {
   const complaint = openDetails.complaint;
-
   console.log(complaint);
+
   if (!complaint) return null;
 
   const getStatusColor = (status: string) => {
@@ -67,6 +72,54 @@ export function ComplaintDetailsDialog({
     }
   };
 
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith('image/')) {
+      return <ImageIcon className="h-5 w-5" />;
+    }
+    return <File className="h-5 w-5" />;
+  };
+
+  const handleDownload = async () => {
+    const attachment = complaint?.attachment;
+    if (!attachment?.file_path) {
+      console.warn('No attachment found for this complaint.');
+      return;
+    }
+
+    const filePath = attachment.file_path.replace(/^\/+/, '');
+    const fileUrl = `${API_VOICE_URL}/${filePath}`;
+    const fileName = filePath.split('/').pop() || 'attachment';
+
+    try {
+      // Fetch the file as a blob
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+
+      // Create a blob URL
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      link.style.display = 'none';
+
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up the blob URL
+      window.URL.revokeObjectURL(blobUrl);
+
+      console.log(`Downloading ${fileName} from ${fileUrl}`);
+    } catch (error) {
+      console.error('Download failed:', error);
+
+      // Fallback: Open in new tab if blob approach fails
+      window.open(fileUrl, '_blank');
+    }
+  };
   return (
     <Dialog
       open={openDetails.isOpen}
@@ -268,6 +321,38 @@ export function ComplaintDetailsDialog({
                 <div>
                   <span className="font-medium">Description:</span>
                   <p className="text-sm ">{complaint.office.description}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Attachment */}
+          {complaint.attachment && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Attachment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-3 border rounded-md">
+                  <div className="flex items-center gap-3">
+                    {getFileIcon(complaint.attachment.file_type)}
+                    <div>
+                      <p className="font-medium">
+                        {complaint?.attachment?.file_path?.split('/').pop()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {complaint.attachment.file_type} • Uploaded{' '}
+                        {formatDate(complaint.attachment.uploaded_at)}
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={handleDownload}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
                 </div>
               </CardContent>
             </Card>
