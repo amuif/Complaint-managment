@@ -30,16 +30,12 @@ function RatingsPageContent() {
     to: new Date(),
   });
 
-  const { ratings, publicRatings, isLoading, isError, error } = useRatings();
+  const { publicRatings, isLoading, isError, error } = useRatings();
   // Combine both rating sources
-  const allRatings = [
-    ...(Array.isArray(ratings) ? ratings : []),
-    ...(Array.isArray(publicRatings) ? publicRatings : []),
-  ];
+  const allRatings = publicRatings;
   useEffect(() => {
-    console.log('rating', ratings);
     console.log('public', publicRatings);
-  }, [ratings, publicRatings]);
+  }, [publicRatings]);
 
   // Calculate average rating for each category
   const getAverageRating = (category: 'courtesy' | 'punctuality' | 'knowledge') => {
@@ -58,6 +54,36 @@ function RatingsPageContent() {
     return (sum / allRatings.length).toFixed(1);
   };
 
+  const getResponsible = (rating: any) => {
+    if (rating?.employee) {
+      return `${rating.employee.first_name_en ?? ''} ${rating.employee.last_name_en ?? ''}`.trim();
+    }
+    if (rating?.department) {
+      return rating.department.name_en;
+    }
+    if (rating?.division) {
+      return rating.division.name_en;
+    }
+    if (rating?.sector) {
+      return rating.sector.name_en;
+    }
+    return 'Unknown';
+  };
+  const getResponsibleTitle = (rating: any) => {
+    if (rating?.employee) {
+      return 'Employee';
+    }
+    if (rating?.department) {
+      return 'Team';
+    }
+    if (rating?.division) {
+      return 'Director';
+    }
+    if (rating?.sector) {
+      return 'Sector';
+    }
+    return 'Unknown';
+  };
   // Filter ratings by type and search criteria
   const filterByType = (type: 'all' | 'excellent' | 'good' | 'poor') => {
     return allRatings.filter((rating) => {
@@ -182,6 +208,9 @@ function RatingsPageContent() {
                 Average
               </th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
+                Rated Employee
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
                 Date
               </th>
             </tr>
@@ -226,6 +255,7 @@ function RatingsPageContent() {
                   <td className="px-4 py-2">
                     {getAverageRatingBadge(rating.courtesy, rating.punctuality, rating.knowledge)}
                   </td>
+                  <td className="px-4 py-2">{getResponsible(rating)}</td>
                   <td className="px-4 py-2">{new Date(rating.created_at).toLocaleDateString()}</td>
                 </tr>
               ))
