@@ -53,6 +53,8 @@ import { handleApiSuccess } from '@/lib/error-handler';
 import { ComplaintDetailsDialog } from '../complaint-details-dialog';
 import { Complaint } from '@/types/complaint';
 
+import { differenceInDays } from 'date-fns';
+
 interface ComplaintManagementTableProps {
   searchQuery: string;
   regionFilter: string;
@@ -119,6 +121,12 @@ export function ComplaintManagementTable({
       setStatus(opedEditStatus.complaint.status);
     }
   }, [opedEditStatus]);
+
+  const isOverdue = (complaint: Complaint) => {
+    if (complaint.response) return false;
+    const createdAt = parseISO(complaint.created_at);
+    return differenceInDays(new Date(), createdAt) > 3;
+  };
   const filteredComplaints = complaints.filter((complaint) => {
     const matchesSearch =
       !searchQuery ||
@@ -375,13 +383,20 @@ export function ComplaintManagementTable({
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={getStatusColor(complaint.status!)}>
-                      <span className="flex items-center gap-1">
-                        {/* {getStatusIcon(complaint.status!)} */}
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={getStatusColor(complaint.status!)}>
                         {complaint.status}
-                      </span>
-                    </Badge>
+                      </Badge>
+
+                      {isOverdue(complaint) && (
+                        <span className="flex items-center gap-1 text-red-600 text-xs font-medium">
+                          <AlertCircle className="w-4 h-4" />
+                          Overdue
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
+
                   <TableCell>{formatDate(complaint.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
