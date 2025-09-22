@@ -355,8 +355,9 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
               <div className="text-sm text-muted-foreground bg-blue-50 p-3 rounded-md border-l-4 border-blue-400">
                 <p className="font-medium text-blue-800 mb-1">Admin Role Assignment:</p>
                 <p className="text-blue-700">
-                  If you create an admin with subcity only, they will be a subcity admin by default.
-                  However, if you add a sector, they will become an admin for that specific sector.
+                  If you create an admin that do not have branch it's automatically assumed to be
+                  the new admin works in the main office.If you want to add an admin with branch you
+                  must include the branch location.
                 </p>
               </div>
             </CardHeader>
@@ -368,7 +369,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Subcities" />
+                        <SelectValue placeholder="Branches" />
                       </SelectTrigger>
                       <SelectContent>
                         {Subcities.map((s) => (

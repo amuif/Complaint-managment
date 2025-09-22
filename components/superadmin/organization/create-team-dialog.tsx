@@ -132,11 +132,13 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
                     <SelectValue placeholder="Directors" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Directors.filter((director)=>director.sector_id === formData.sector_id).map((division, index) => (
-                      <SelectItem key={index} value={division.id}>
-                        {division.name_en}
-                      </SelectItem>
-                    ))}
+                    {Directors.filter((director) => director.sector_id === formData.sector_id).map(
+                      (division, index) => (
+                        <SelectItem key={index} value={division.id}>
+                          {division.name_en}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -172,12 +174,12 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="office_number">Office Number</Label>
+                <Label htmlFor="office_number">Office Number and floor number</Label>
                 <Input
                   id="office_number"
                   value={formData.office_number}
                   onChange={(e) => handleInputChange('office_number', e.target.value)}
-                  placeholder="Enter office number"
+                  placeholder="Enter your input here"
                 />
               </div>
 

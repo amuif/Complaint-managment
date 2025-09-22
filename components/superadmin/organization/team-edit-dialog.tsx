@@ -172,12 +172,12 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="office_number">Office Number</Label>
+            <Label htmlFor="office_number">Office Number and floor number</Label>
             <Input
               id="office_number"
               value={formData.office_number}
               onChange={(e) => handleInputChange('office_number', e.target.value)}
-              placeholder="Enter office number"
+              placeholder="Enter your input here"
             />
           </div>
 
