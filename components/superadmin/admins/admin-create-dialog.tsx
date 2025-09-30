@@ -79,7 +79,7 @@ const userCreateSchema = z.object({
   phone: z.string().min(1, 'Phone is required'),
   city: z.string().min(1, 'City is required'),
   role: z.string(),
-  subcity_id: z.string().min(1, 'Subcity is required'),
+  subcity_id: z.string().optional(),
   sector_id: z.string().min(1, 'Sector is required').optional(),
   division_id: z.string().optional(),
   department_id: z.string().optional(),
