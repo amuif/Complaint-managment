@@ -143,15 +143,11 @@ export default function SuperAdminAnalyticsPage() {
       {/* Filters */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            System Analytics
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight">System Analytics</h2>
         </div>
         <div className="flex items-center gap-2">
           {memoizedSubcities.length === 0 ? (
-            <div className="text-gray-500">
-              No subcities available
-            </div>
+            <div className="text-gray-500">No subcities available</div>
           ) : (
             <Select
               value={selectedRegion}
@@ -159,10 +155,10 @@ export default function SuperAdminAnalyticsPage() {
               disabled={memoizedSubcities.length === 0}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder= 'Select Region'/>
+                <SelectValue placeholder="Select Region" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all"> 'All Regions'</SelectItem>
+                <SelectItem value="all"> All Regions</SelectItem>
                 {memoizedSubcities.map((subcity) => (
                   <SelectItem key={subcity.id} value={subcity.id.toString()}>
                     {subcity.name_en}
@@ -179,9 +175,7 @@ export default function SuperAdminAnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Employees
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredEmployees.length}</div>
@@ -189,9 +183,7 @@ export default function SuperAdminAnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-               Total Ratings
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Ratings</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredRatings.length}</div>
@@ -199,9 +191,7 @@ export default function SuperAdminAnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Complaints
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredComplaints.length}</div>
@@ -209,9 +199,7 @@ export default function SuperAdminAnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Feedback
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Feedback</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredFeedback.length}</div>
@@ -234,9 +222,7 @@ export default function SuperAdminAnalyticsPage() {
 
               <CardContent>
                 {complaintData.length === 0 ? (
-                  <div className="text-center text-gray-500">
-                    No data available
-                  </div>
+                  <div className="text-center text-gray-500">No data available</div>
                 ) : (
                   <BarChart data={complaintData} xAxisKey="name" yAxisKey="value" height={400} />
                 )}
@@ -348,4 +334,3 @@ export default function SuperAdminAnalyticsPage() {
     </div>
   );
 }
-

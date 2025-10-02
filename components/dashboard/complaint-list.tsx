@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MoreHorizontal, Send } from 'lucide-react';
+import { AlertCircle, MoreHorizontal, Send } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +36,8 @@ import {
 import { handleApiSuccess } from '@/lib/error-handler';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { differenceInDays } from 'date-fns';
+
 import { ComplaintDetailsDialog } from '../complaint-details-dialog';
 interface ComplaintListProps {
   searchQuery: string;
@@ -162,6 +164,11 @@ export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: Com
     }
   });
 
+  const isOverdue = (complaint: Complaint) => {
+    if (complaint.response) return false;
+    const createdAt = parseISO(complaint.created_at || complaint.updated_at);
+    return differenceInDays(new Date(), createdAt) > 3;
+  };
   // Copy tracking code
   const handleCopyTrackingCode = (trackingCode: string) => {
     if (!trackingCode) return;
@@ -250,9 +257,17 @@ export function ComplaintList({ searchQuery, statusFilter, priorityFilter }: Com
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={getStatusColor(complaint.status!)}>
-                    <span className="flex items-center gap-1">{complaint.status}</span>
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={getStatusColor(complaint.status!)}>
+                      <span className="flex items-center gap-1">{complaint.status}</span>
+                    </Badge>
+                    {isOverdue(complaint) && (
+                      <span className="flex items-center gap-1 text-red-600 text-xs font-medium">
+                        <AlertCircle className="w-4 h-4" />
+                        Overdue
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>{formatDate(complaint.created_at)}</TableCell>
                 <TableCell className="text-right">

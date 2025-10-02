@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ComplaintFilters } from '@/components/dashboard/complaint-filters';
 import { ComplaintList } from '@/components/dashboard/complaint-list';

@@ -124,7 +124,7 @@ export function ComplaintManagementTable({
 
   const isOverdue = (complaint: Complaint) => {
     if (complaint.response) return false;
-    const createdAt = parseISO(complaint.created_at);
+    const createdAt = parseISO(complaint.created_at || complaint.updated_at);
     return differenceInDays(new Date(), createdAt) > 3;
   };
   const filteredComplaints = complaints.filter((complaint) => {

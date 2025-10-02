@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="">
       <body suppressHydrationWarning className={inter.className}>
         <ReactQueryProvider>
           <AuthProvider>

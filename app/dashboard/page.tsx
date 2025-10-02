@@ -6,20 +6,15 @@ import { useLanguage } from '@/components/language-provider';
 import { useStatistics } from '@/hooks/use-statistics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import {
   Users,
-  MessageSquare,
   FileText,
   Star,
   TrendingUp,
   CheckCircle,
   AlertTriangle,
-  BarChart3,
-  Calendar,
   Loader2,
 } from 'lucide-react';
-import { adminRoles } from '@/types/user';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -147,9 +142,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-
       <div className="grid gap-6">
-
         <Card>
           <CardHeader>
             <CardTitle>System Alerts</CardTitle>
@@ -168,7 +161,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
               )}
-
             </div>
           </CardContent>
         </Card>

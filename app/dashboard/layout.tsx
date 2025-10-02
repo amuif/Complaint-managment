@@ -136,12 +136,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-blue-50 dark:bg-blue-950">
+    <div className="flex min-h-screen flex-col bg-blue-50 dark:bg-blue-950 min-w-screen min-w-[100%] w-fit">
       <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-white dark:bg-blue-900 px-4 sm:static md:hidden">
         <Button
           variant="outline"
           size="icon"
-          className="md:hidden"
+          className="md:hidden p-4"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu className="h-5 w-5" />
@@ -196,7 +196,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      <div className="flex flex-1 flex-col md:grid md:grid-cols-[auto_1fr]">
+      <div className="flex pr-4 flex-1 flex-col md:grid md:grid-cols-[auto_1fr]">
         {/* Desktop sidebar */}
         <aside
           className={`hidden border-r bg-white dark:bg-blue-900 md:flex md:flex-col ${
