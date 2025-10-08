@@ -6,7 +6,10 @@ export interface Department {
   appointed_person_en: string;
   appointed_person_am: string;
   appointed_person_af: string;
-  office_number: string;
+  office_location_en: string;
+  office_location_af: string;
+  office_location_am: string;
+
   profile_picture: string;
   created_at: string;
   sector_id: string;

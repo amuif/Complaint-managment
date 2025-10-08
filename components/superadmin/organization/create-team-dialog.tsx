@@ -35,13 +35,15 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
     name_en: '',
     name_af: '',
     name_am: '',
-    office_number: '',
     profile_picture: '',
     appointed_person_en: '',
     appointed_person_af: '',
     appointed_person_am: '',
     sector_id: '',
     division_id: '',
+    office_location_en: '',
+    office_location_am: '',
+    office_location_af: '',
   });
 
   const handleInputChange = (field: keyof Department, value: string | number) => {
@@ -55,12 +57,14 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
     data.append('name_en', formData.name_en);
     data.append('name_af', formData.name_af);
     data.append('name_am', formData.name_am);
-    data.append('office_number', formData.office_number);
     data.append('appointed_person_en', formData.appointed_person_en);
     data.append('appointed_person_af', formData.appointed_person_af);
     data.append('appointed_person_am', formData.appointed_person_am);
     data.append('sector_id', formData.sector_id);
     data.append('division_id', formData.division_id);
+    data.append('office_location_en', formData.office_location_en);
+    data.append('office_location_am', formData.office_location_am);
+    data.append('office_location_af', formData.office_location_af);
 
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
@@ -71,6 +75,7 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       console.log('response', response);
       handleApiSuccess(response.message);
       setIsOpen(false);
+      window.location.reload();
     } catch (error) {
       handleApiError(error);
       console.error('Update failed', error);
@@ -81,13 +86,15 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       name_en: '',
       name_af: '',
       name_am: '',
-      office_number: '',
       profile_picture: '',
       appointed_person_en: '',
       appointed_person_af: '',
       appointed_person_am: '',
       sector_id: '',
       division_id: '',
+      office_location_en: '',
+      office_location_am: '',
+      office_location_af: '',
     });
 
     setIsOpen(false);
@@ -173,16 +180,6 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
                 />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="office_number">Office Number and floor number</Label>
-                <Input
-                  id="office_number"
-                  value={formData.office_number}
-                  onChange={(e) => handleInputChange('office_number', e.target.value)}
-                  placeholder="Enter your input here"
-                />
-              </div>
-
               <Label htmlFor="profile_picture">Profile Picture</Label>
               <Input
                 id="profile_picture"
@@ -221,6 +218,34 @@ const CreateTeamDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
                   value={formData.appointed_person_am}
                   onChange={(e) => handleInputChange('appointed_person_am', e.target.value)}
                   placeholder="Enter appointed person name in Amharic"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_en">Office Location (English)</Label>
+                <Input
+                  id="office_location_en"
+                  value={formData.office_location_en}
+                  onChange={(e) => handleInputChange('office_location_en', e.target.value)}
+                  placeholder="Enter appointed person name in english"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_am">Office Location (Amharic)</Label>
+                <Input
+                  id="office_location_am"
+                  value={formData.office_location_am}
+                  onChange={(e) => handleInputChange('office_location_am', e.target.value)}
+                  placeholder="Enter appointed person name in Amharic"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_af">Office Location (Oromoo)</Label>
+                <Input
+                  id="office_location_af"
+                  value={formData.office_location_af}
+                  onChange={(e) => handleInputChange('office_location_af', e.target.value)}
+                  placeholder="Enter appointed person name in oromic"
                 />
               </div>
             </div>

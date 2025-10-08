@@ -53,6 +53,7 @@ const TeamTable = ({ teams }: TeamTableProps) => {
     const response = await deleteTeam(selectedTeam?.id!);
     handleApiSuccess(response.message);
     setIsOpenDialog(false);
+    window.location.reload();
   };
   useEffect(() => {
     console.log(teams);
