@@ -3,16 +3,12 @@
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Download, Users, FileText, MessageSquare, Star } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/language-provider';
 import { SubcityEmployees } from '@/components/superadmin/subcity-employees';
 import { SubcityFeedback } from '@/components/superadmin/subcity-feedback';
 import { SubcityComplaints } from '@/components/superadmin/subcity-complaints';
-import { SubcityStats } from '@/components/superadmin/subcity-stats';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { sub } from 'date-fns';
 import { useEmployees } from '@/hooks/use-employees';
 import { useRatings } from '@/hooks/use-ratings';
 import { useFeedback } from '@/hooks/use-feedback';
@@ -104,7 +100,7 @@ export default function SubcityDetailPage() {
           <div className="bg-white dark:bg-[#0a0f1a] p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
             <h3 className="font-medium text-gray-800 dark:text-gray-100">Total Feedback</h3>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {publicFeedback?.feedback.length}{' '}
+              {publicFeedback?.length}{' '}
             </p>
           </div>
         </div>

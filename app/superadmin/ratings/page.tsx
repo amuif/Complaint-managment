@@ -192,9 +192,7 @@ function RatingsPageContent() {
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
                 Name
               </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
-                Service
-              </th>
+
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
                 Courtesy
               </th>
@@ -208,7 +206,7 @@ function RatingsPageContent() {
                 Average
               </th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
-                Rated Employee
+                Rated
               </th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
                 Date
@@ -233,7 +231,6 @@ function RatingsPageContent() {
                   <td className="px-4 py-2 font-medium flex items-center gap-2">
                     {rating.full_name || 'Unknown Employee'}
                   </td>
-                  <td className="px-4 py-2">{rating.service_type || 'General Service'}</td>
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-1">
                       {getRatingStars(rating.courtesy)}

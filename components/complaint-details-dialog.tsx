@@ -203,12 +203,16 @@ export function ComplaintDetailsDialog({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Team
+                  Complained on
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>
-                  <span className="font-medium">Name:</span> {complaint.department?.name_en}
+                  <span className="font-medium">Name:</span>{' '}
+                  {complaint?.department?.name_en ||
+                    complaint.division?.name_en ||
+                    complaint.sector.name_en ||
+                    'Unassigned'}
                 </div>
                 <div></div>
                 <div>

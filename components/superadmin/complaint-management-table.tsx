@@ -320,7 +320,7 @@ export function ComplaintManagementTable({
                 </Button>
               </TableHead>
               <TableHead>Contact</TableHead>
-              <TableHead>Teams</TableHead>
+              <TableHead>Complained on</TableHead>
               <TableHead>
                 <Button
                   variant="ghost"
@@ -375,7 +375,10 @@ export function ComplaintManagementTable({
                   <TableCell>
                     <div>
                       <div className="font-medium">
-                        {complaint?.department?.name_en || 'Unassigned'}
+                        {complaint?.department?.name_en ||
+                          complaint.division?.name_en ||
+                          complaint.sector.name_en ||
+                          'Unassigned'}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {complaint.sub_city?.name_en || 'subcity not assigned'}
