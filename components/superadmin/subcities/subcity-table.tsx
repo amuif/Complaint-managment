@@ -61,6 +61,7 @@ const SubcityTable = () => {
       const response = await deleteSubcity(selectedSubcity?.id!);
       handleApiSuccess(response.message);
       setIsOpenDialog(false);
+      window.location.reload();
     } catch (error) {
       console.log('Error at updating subcity', error);
       handleApiError('Error at updating subcity');

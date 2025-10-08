@@ -6,5 +6,8 @@ export interface Subcities {
   appointed_person_en: string;
   appointed_person_am: string;
   appointed_person_af: string;
+  office_location_en: string;
+  office_location_af: string;
+  office_location_am: string;
   created_at: string;
 }

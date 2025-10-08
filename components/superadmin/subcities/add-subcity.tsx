@@ -16,13 +16,14 @@ import { useOrganization } from '@/hooks/use-organization';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 import { Subcities } from '@/types/subcities';
 import { useSubcity } from '@/hooks/use-subcity';
-interface AddSectorDialogProps {
+interface AddSubcityDialogProps {
   open: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
+const CreateSubcityDialog = ({ open, setIsOpen }: AddSubcityDialogProps) => {
   const { createSubcity } = useSubcity();
+  const { Subcities } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name_en: '',
@@ -31,6 +32,9 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
     appointed_person_en: '',
     appointed_person_af: '',
     appointed_person_am: '',
+    office_location_en: '',
+    office_location_am: '',
+    office_location_af: '',
   });
 
   const handleInputChange = (field: keyof Subcities, value: string | number) => {
@@ -47,6 +51,9 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       appointed_person_en: formData.appointed_person_en,
       appointed_person_af: formData.appointed_person_af,
       appointed_person_am: formData.appointed_person_am,
+      office_location_en: formData.office_location_en,
+      office_location_af: formData.office_location_af,
+      office_location_am: formData.office_location_am,
     };
     console.log('payload', payload);
 
@@ -55,6 +62,7 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       console.log('response', response);
       handleApiSuccess(response.message);
       setIsOpen(false);
+      window.location.reload();
     } catch (error) {
       handleApiError(error);
       console.error('Update failed', error);
@@ -68,6 +76,9 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       appointed_person_en: '',
       appointed_person_af: '',
       appointed_person_am: '',
+      office_location_en: '',
+      office_location_af: '',
+      office_location_am: '',
     });
     setIsOpen(false);
   };
@@ -78,15 +89,15 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
         <Dialog open={open} onOpenChange={setIsOpen}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Sector</DialogTitle>
+              <DialogTitle>Create Subcity</DialogTitle>
               <DialogDescription>
-                Add new sector's information and finally click create when you're done.
+                Add new subcity's information and finally click create when you're done.
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="name_en">Sector Name (English)</Label>
+                <Label htmlFor="name_en">Subcity Name (English)</Label>
                 <Input
                   id="name_en"
                   value={formData.name_en}
@@ -96,7 +107,7 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="name_af">Sector Name (Afaan Oromoo)</Label>
+                <Label htmlFor="name_af">Subcity Name (Afaan Oromoo)</Label>
                 <Input
                   id="name_af"
                   value={formData.name_af}
@@ -106,7 +117,7 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="name_am">Sector Name (Amharic)</Label>
+                <Label htmlFor="name_am">Subcity Name (Amharic)</Label>
                 <Input
                   id="name_am"
                   value={formData.name_am}
@@ -134,7 +145,6 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
                   placeholder="Enter appointed person name in Afaan Oromoo"
                 />
               </div>
-
               <div className="grid gap-2">
                 <Label htmlFor="appointed_person_am">Appointed Person (Amharic)</Label>
                 <Input
@@ -142,6 +152,34 @@ const CreateSubcityDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
                   value={formData.appointed_person_am}
                   onChange={(e) => handleInputChange('appointed_person_am', e.target.value)}
                   placeholder="Enter appointed person name in Amharic"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_en">Office Location (English)</Label>
+                <Input
+                  id="office_location_en"
+                  value={formData.office_location_en}
+                  onChange={(e) => handleInputChange('office_location_en', e.target.value)}
+                  placeholder="Enter appointed person name in english"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_am">Office Location (Amharic)</Label>
+                <Input
+                  id="office_location_am"
+                  value={formData.office_location_am}
+                  onChange={(e) => handleInputChange('office_location_am', e.target.value)}
+                  placeholder="Enter appointed person name in Amharic"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="office_location_af">Office Location (Oromoo)</Label>
+                <Input
+                  id="office_location_af"
+                  value={formData.office_location_af}
+                  onChange={(e) => handleInputChange('office_location_af', e.target.value)}
+                  placeholder="Enter appointed person name in oromic"
                 />
               </div>
             </div>

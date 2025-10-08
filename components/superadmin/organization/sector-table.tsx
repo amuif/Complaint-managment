@@ -53,6 +53,7 @@ const SectorTable = ({ sectors }: SectorTableProps) => {
     deleteSector(selectedSector?.id!);
     setIsOpenDialog(false);
     getSectors();
+    window.location.reload();
   };
 
   useEffect(() => {

@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { subcityApi } from '@/lib/api';
 import { Subcities } from '@/types/subcities';
 
-// Hook for subcity-specific employees
 export function useSubcityEmployees(subcity: string) {
   const employeesQuery = useQuery({
     queryKey: ['subcity-employees', subcity],

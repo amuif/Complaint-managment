@@ -34,6 +34,9 @@ const EditSubcityDialog = ({ subcity, open, onOpenChange }: EditSubcityDialogPro
     appointed_person_en: '',
     appointed_person_af: '',
     appointed_person_am: '',
+    office_location_en: '',
+    office_location_am: '',
+    office_location_af: '',
   });
 
   useEffect(() => {
@@ -58,12 +61,16 @@ const EditSubcityDialog = ({ subcity, open, onOpenChange }: EditSubcityDialogPro
       appointed_person_en: formData.appointed_person_en,
       appointed_person_af: formData.appointed_person_af,
       appointed_person_am: formData.appointed_person_am,
+      office_location_en: formData.office_location_en,
+      office_location_af: formData.office_location_af,
+      office_location_am: formData.office_location_am,
     };
     console.log('payload', payload);
     try {
       const respose = await updateSubcity(payload);
       handleApiSuccess(respose.message);
       onOpenChange(false);
+      window.location.reload();
     } catch (error) {
       console.error('Update failed', error);
       handleApiError('Update failed');
@@ -144,6 +151,34 @@ const EditSubcityDialog = ({ subcity, open, onOpenChange }: EditSubcityDialogPro
               value={formData.appointed_person_am}
               onChange={(e) => handleInputChange('appointed_person_am', e.target.value)}
               placeholder="Enter appointed person name in Amharic"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="office_location_en">Office Location (English)</Label>
+            <Input
+              id="office_location_en"
+              value={formData.office_location_en}
+              onChange={(e) => handleInputChange('office_location_en', e.target.value)}
+              placeholder="Enter appointed person name in english"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="office_location_am">Office Location (Amharic)</Label>
+            <Input
+              id="office_location_am"
+              value={formData.office_location_am}
+              onChange={(e) => handleInputChange('office_location_am', e.target.value)}
+              placeholder="Enter appointed person name in Amharic"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="office_location_af">Office Location (Oromoo)</Label>
+            <Input
+              id="office_location_af"
+              value={formData.office_location_af}
+              onChange={(e) => handleInputChange('office_location_af', e.target.value)}
+              placeholder="Enter appointed person name in oromic"
             />
           </div>
         </div>

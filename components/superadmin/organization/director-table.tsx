@@ -57,6 +57,7 @@ const DirectorTable = ({ directors }: DirectorTableProps) => {
     const response = await deleteDirector(selectedDirector?.id!);
     handleApiSuccess(response.message);
     setIsOpenDialog(false);
+    window.location.reload();
   };
   useEffect(() => {
     console.log(directors);
