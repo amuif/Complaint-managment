@@ -60,20 +60,20 @@ export default function SubcitiesPage() {
             </div>
           </TabsContent>
 
-          {/* <TabsContent value="map" className="mt-0"> */}
-          {/*   <Card className="overflow-hidden border-none shadow-md"> */}
-          {/*     <CardHeader> */}
-          {/*       <CardTitle>{t('subCitiesMap')}</CardTitle> */}
-          {/*       <CardDescription>{t('subCitiesMapDesc')}</CardDescription> */}
-          {/*     </CardHeader> */}
-          {/*     <CardContent> */}
-          {/*       <div className="aspect-[16/9] w-full rounded-md bg-muted/50 flex items-center justify-center"> */}
-          {/*         <Map className="h-12 w-12 text-muted-foreground/50" /> */}
-          {/*         <p className="ml-2 text-muted-foreground">{t('interactiveMapComingSoon')}</p> */}
-          {/*       </div> */}
-          {/*     </CardContent> */}
-          {/*   </Card> */}
-          {/* </TabsContent> */}
+          <TabsContent value="map" className="mt-0">
+            <Card className="overflow-hidden border-none shadow-md">
+              <CardHeader>
+                <CardTitle>{t('subCitiesMap')}</CardTitle>
+                <CardDescription>{t('subCitiesMapDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-[16/9] w-full rounded-md bg-muted/50 flex items-center justify-center">
+                  <Map className="h-12 w-12 text-muted-foreground/50" />
+                  <p className="ml-2 text-muted-foreground">{t('interactiveMapComingSoon')}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>

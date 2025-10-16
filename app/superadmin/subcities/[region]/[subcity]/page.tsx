@@ -34,7 +34,7 @@ export default function SubcityDetailPage() {
   const formattedSubcity = subcity.toLowerCase().replace('-', ' ');
   useEffect(() => {
     const subcity_id = Subcities.filter(
-      (subcity) => subcity.name_en.toLowerCase() === formattedSubcity.toLowerCase()
+      (subcity) => subcity?.name_en.toLowerCase() === formattedSubcity.toLowerCase()
     ).map((item) => item.id);
     console.log(subcity_id);
     setSubcityId(Number(subcity_id));
@@ -71,7 +71,7 @@ export default function SubcityDetailPage() {
               {
                 employees.filter(
                   (employee) =>
-                    employee.subcity.name_en.toLowerCase() === formattedSubcity.toLowerCase()
+                    employee?.subcity?.name_en.toLowerCase() === formattedSubcity.toLowerCase()
                 ).length
               }
             </p>
