@@ -180,7 +180,11 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
       (Object.entries(validatedData) as [keyof typeof validatedData, unknown][]).forEach(
         ([key, value]) => {
           if (value !== undefined && value !== null) {
-            if (key === 'profile_picture' && value instanceof File) {
+            if (
+              key === 'profile_picture' &&
+              typeof window !== 'undefined' &&
+              value instanceof File
+            ) {
               formData.append(key, value);
             } else {
               formData.append(key, String(value));

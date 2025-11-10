@@ -1,15 +1,15 @@
 'use client';
 
-import AdminTable from '@/components/superadmin/admins/adminsTable';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/use-auth';
 
-const page = () => {
-  const { getAdmins } = useAuth();
-  return (
-    <div>
-      <AdminTable admins={getAdmins} />
-    </div>
-  );
-};
+const AdminTable = dynamic(() => import('@/components/superadmin/admins/adminsTable'), {
+  ssr: false,
+  loading: () => <p>Loading admins...</p>,
+});
 
-export default page;
+export default function AdminsPage() {
+  const { getAdmins } = useAuth();
+
+  return <AdminTable admins={getAdmins} />;
+}
