@@ -93,7 +93,13 @@ const AdminTable = ({ admins }: AdminTableProps) => {
               <TableCell>{index + 1}</TableCell>
               <TableCell className="flex gap-2 items-center ">
                 <Avatar>
-                  <AvatarImage src={`${PICTURE_URL}${admin.profile_picture}`} />
+                  <AvatarImage
+                    src={
+                      typeof window !== 'undefined'
+                        ? `${PICTURE_URL}${admin.profile_picture}`
+                        : '/placeholder.svg?height=64&width=64'
+                    }
+                  />
                   <AvatarFallback>{admin.first_name[0] + admin.last_name[0]}</AvatarFallback>
                 </Avatar>{' '}
                 {admin.first_name + ' ' + admin.last_name}

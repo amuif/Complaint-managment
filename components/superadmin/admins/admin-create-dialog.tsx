@@ -202,7 +202,7 @@ export function UserCreateDialog({ open, onOpenChange }: UserCreateDialogProps) 
                   <Avatar className="h-16 w-16">
                     <AvatarImage
                       src={
-                        profilePicture instanceof File
+                        typeof window !== 'undefined' && profilePicture instanceof File
                           ? URL.createObjectURL(profilePicture)
                           : undefined
                       }
