@@ -3,7 +3,7 @@ import { Complaint } from '@/types/complaint';
 import { QueryClient } from '@tanstack/react-query';
 import { handleApiError, handleApiSuccess } from './error-handler';
 import { Rating } from '@/types/rating';
-import { Employee, EmployeeFiltersTypes } from '@/types/employee';
+import { Employee, } from '@/types/employee';
 import { Sector } from '@/types/sector';
 import { Division } from '@/types/division';
 import { Team } from '@/types/team';
@@ -14,7 +14,7 @@ import { User } from '@/types/user';
 import { ActivityLog } from '@/types/notifications';
 
 // Base API configuration and helper functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend.torobingo.com/api'; // || 'http://196.189.93.235:4000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://196.189.93.235:4000/api';
 
 export interface Service {
   id: number;
