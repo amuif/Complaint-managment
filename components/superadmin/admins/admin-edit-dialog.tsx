@@ -248,7 +248,7 @@ export function UserEditDialog({ user, open, onOpenChange }: UserEditDialogProps
                     <Avatar className="h-16 w-16">
                       <AvatarImage
                         src={
-                          formState.profile_picture instanceof File
+                          typeof window !== 'undefined' && formState.profile_picture instanceof File
                             ? URL.createObjectURL(formState.profile_picture)
                             : typeof formState.profile_picture === 'string'
                               ? `${PICTURE_URL}${formState.profile_picture}
