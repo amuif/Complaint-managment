@@ -11,18 +11,16 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Shield, Mail, Phone, Lock, Camera, User2 } from 'lucide-react';
 import { updateAuthUser, useAuthStore } from '@/lib/auth-store';
-import { adminRoles, User } from '@/types/user';
+import {  User } from '@/types/user';
 import { PICTURE_URL } from '@/constants/base_url';
 import { useAuth } from '@/hooks/use-auth';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';

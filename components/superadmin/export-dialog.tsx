@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, FileSpreadsheet,  Loader2 } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { exportApi } from '@/lib/api';
 import { toast } from 'sonner';
 
 interface ExportDialogProps {
@@ -68,6 +67,7 @@ export function ExportDialog({
 
   const handleExport = async () => {
     setIsExporting(true);
+    const { exportApi } = await import('@/lib/api');
     try {
       const exportFilters = includeFilters ? filters : undefined;
 
