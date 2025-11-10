@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, FileSpreadsheet, File, Loader2 } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet,  Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useLanguage } from '@/components/language-provider';
 import { exportApi } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -32,7 +31,6 @@ export function ExportDialog({
   triggerText,
   triggerVariant = 'outline',
 }: ExportDialogProps) {
-  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<'pdf' | 'csv' | 'excel'>('csv');
   const [includeFilters, setIncludeFilters] = useState(true);

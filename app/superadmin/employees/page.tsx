@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Plus, Download, Filter } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/components/language-provider';
 import {
