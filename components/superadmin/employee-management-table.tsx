@@ -6,7 +6,6 @@ import {
   Edit,
   Trash2,
   Eye,
-  Star,
   Mail,
   Phone,
   Building,
@@ -158,7 +157,7 @@ export function EmployeeManagementTable({
                               <Avatar className="h-10 w-10">
                                 <AvatarImage
                                   src={
-                                    profilePictureFile
+                                    typeof window !== 'undefined' && profilePictureFile
                                       ? URL.createObjectURL(profilePictureFile)
                                       : employee.profile_picture
                                         ? `${PICTURE_URL}${employee.profile_picture}`

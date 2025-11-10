@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/language-provider';
-import { toast } from 'sonner';
 import { useEmployees } from '@/hooks/use-employees';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 import { useOrganization } from '@/hooks/use-organization';
@@ -431,7 +430,7 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 <Avatar className="h-16 w-16">
                   <AvatarImage
                     src={
-                      profilePicture instanceof File
+                      typeof window !== 'undefined' && profilePicture instanceof File
                         ? URL.createObjectURL(profilePicture)
                         : '/placeholder.svg?height=64&width=64'
                     }
