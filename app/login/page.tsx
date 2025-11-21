@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Eye, EyeOff, Building2, Lock, User, ArrowRight, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -65,8 +66,8 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-center items-center p-8 text-white w-full">
           <div className="text-center max-w-md">
             <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="w-12 h-12  rounded-xl flex items-center justify-center">
+                <Image src="/logo.png" alt="Traffice minster logo" width={500} height={500} />
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">{t('appName')}</h1>
@@ -111,7 +112,7 @@ export default function LoginPage() {
 
             <div className="mt-8 text-center">
               <p className="text-slate-400 text-xs">
-                © 2024 Office Management System. All rights reserved.
+                © 2025 Office Management System. All rights reserved.
               </p>
             </div>
           </div>
@@ -241,7 +242,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
         </div>
       </div>
     </div>
