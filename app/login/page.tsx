@@ -70,7 +70,7 @@ export default function LoginPage() {
                 <Image src="/logo.png" alt="Traffice minster logo" width={500} height={500} />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight">{t('appName')}</h1>
+                <h1 className="text-lg font-bold text-center tracking-tight">{t('appName')}</h1>
                 <p className="text-slate-300 text-sm mt-1">Admin Portal</p>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function LoginPage() {
 
             <div className="mt-8 text-center">
               <p className="text-slate-400 text-xs">
-                © 2025 Office Management System. All rights reserved.
+                © 2025 Addis Ababa Traffic Management Authority . All rights reserved.
               </p>
             </div>
           </div>
@@ -121,11 +121,19 @@ export default function LoginPage() {
 
       {/* Right Panel - Login Form */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12  rounded-xl flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  className="object-cover"
+                  alt="Traffice minster logo"
+                  width={500}
+                  height={500}
+                />
+              </div>
               <span className="text-lg font-bold text-blue-900 dark:text-white">
                 {t('appName')}
               </span>
