@@ -6,7 +6,7 @@ import { useAuthStore } from '@/lib/auth-store';
 
 export function useEmployees() {
   const queryClient = useQueryClient();
-  const { token, isAuthenticated } = useAuthStore();
+  const { token } = useAuthStore();
   // Get all employees
   const employeesQuery = useQuery({
     queryKey: ['get-employees'],

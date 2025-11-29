@@ -5,23 +5,30 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Users, Building, MapPin } from 'lucide-react';
 import { useEmployees } from '@/hooks/use-employees';
-import { useMemo } from 'react';
-import { Employee } from '@/types/employee';
+import { useEffect, useMemo } from 'react';
 
 interface SubcityEmployeesProps {
   subcity: string;
 }
 
 export function SubcityEmployees({ subcity }: SubcityEmployeesProps) {
+
   const { employees, isLoading, isError } = useEmployees();
 
   const validEmployees = useMemo(() => {
     if (!employees || !Array.isArray(employees)) return [];
 
-    return employees.filter(
+    const foundEmployees = employees.filter(
       (employee) => employee?.subcity?.name_en?.toLowerCase() === subcity.toLowerCase()
     );
+    console.log(foundEmployees)
+    return foundEmployees 
   }, [employees, subcity]);
+
+  useEffect(()=>{
+    console.log(employees)
+  console.log(subcity)
+  },[subcity,employees])
 
   if (isLoading) {
     return (

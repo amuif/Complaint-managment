@@ -31,6 +31,7 @@ export interface Employee {
   division_id: number | null;
   team_id: number | null;
   department_id: number | null;
+  subcity_id?:number | null;
 
   department: Department;
   sector: Sector;

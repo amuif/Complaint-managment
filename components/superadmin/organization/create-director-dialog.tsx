@@ -16,6 +16,7 @@ import { Division } from '@/types/division';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -25,7 +26,7 @@ interface AddDirectorDialogProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 export const AddDirectorDialog = ({ open, setIsOpen }: AddDirectorDialogProps) => {
-  const { createDirector, Sectors } = useOrganization();
+  const { createDirector, Sectors, Subcities } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name_en: '',
@@ -39,6 +40,7 @@ export const AddDirectorDialog = ({ open, setIsOpen }: AddDirectorDialogProps) =
     office_location_en: '',
     office_location_am: '',
     office_location_af: '',
+    subcity_id: '',
   });
 
   const handleInputChange = (field: keyof Division, value: string | number) => {
@@ -59,6 +61,7 @@ export const AddDirectorDialog = ({ open, setIsOpen }: AddDirectorDialogProps) =
     data.append('office_location_en', formData.office_location_en);
     data.append('office_location_am', formData.office_location_am);
     data.append('office_location_af', formData.office_location_af);
+    data.append('subcity_id', formData.subcity_id)
 
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
@@ -87,6 +90,7 @@ export const AddDirectorDialog = ({ open, setIsOpen }: AddDirectorDialogProps) =
       office_location_en: '',
       office_location_am: '',
       office_location_af: '',
+      subcity_id: '',
     });
     setIsOpen(false);
   };
@@ -107,6 +111,27 @@ export const AddDirectorDialog = ({ open, setIsOpen }: AddDirectorDialogProps) =
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Select
+                  value={formData.subcity_id}
+                  onValueChange={(value) => handleInputChange("subcity_id", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a subcity" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      {Subcities.map((subcity) => (
+                        <SelectItem key={subcity.id} value={String(subcity.id)}>
+                          {subcity.name_en}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid gap-2">
                 <Select
                   value={formData.sector_id}

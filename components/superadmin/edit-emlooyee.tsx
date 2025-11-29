@@ -23,11 +23,9 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
 import { Edit, Upload, Loader2, User, Briefcase, MapPin, GraduationCap } from 'lucide-react';
 import type { Employee } from '@/types/employee';
 import { useLanguage } from '@/components/language-provider';
-import { toast } from 'sonner';
 import { useEmployees } from '@/hooks/use-employees';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
 import { useOrganization } from '@/hooks/use-organization';
@@ -44,7 +42,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { updateEmployee } = useEmployees();
-  const { Sectors, Directors, Teams,Subcities } = useOrganization();
+  const { Sectors, Directors, Teams, Subcities } = useOrganization();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<Partial<Employee>>({
@@ -73,7 +71,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
     phone: employee.phone || '',
     // Location
     city: employee.city || '',
-    subcity: employee.subcity || '',
+    subcity_id: employee.subcity_id || null,
     section: employee.section || '',
     office_number: employee.office_number || '',
     floor_number: employee.floor_number || 1,
@@ -120,6 +118,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
         }
       }
     }
+    console.log(data)
 
     try {
       const response = await updateEmployee(data);
@@ -190,7 +189,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
                     profilePictureFile
                       ? URL.createObjectURL(profilePictureFile)
                       : `${PICTURE_URL}${formData.profile_picture}` ||
-                        '/placeholder.svg?height=80&width=80'
+                      '/placeholder.svg?height=80&width=80'
                   }
                   alt={employeeName}
                 />
@@ -424,17 +423,17 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
                   </SelectContent>
                 </Select>
               </div>
-              
-            {/* Status */}
-            <div className="flex pt-5 items-center space-x-2">
-              <Checkbox
-                id="works_in_head_office"
-                checked={formData.works_in_head_office}
-                onCheckedChange={(checked) => handleInputChange('works_in_head_office', checked)}
+
+              {/* Status */}
+              <div className="flex pt-5 items-center space-x-2">
+                <Checkbox
+                  id="works_in_head_office"
+                  checked={formData.works_in_head_office}
+                  onCheckedChange={(checked) => handleInputChange('works_in_head_office', checked)}
                   className='h-6 w-6 '
-              />
-              <Label htmlFor="works_in_head_office">Works in main office?</Label>
-            </div>
+                />
+                <Label htmlFor="works_in_head_office">Works in main office?</Label>
+              </div>
             </div>
 
           </TabsContent>
@@ -452,11 +451,11 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
               <div className="space-y-2">
                 <Label htmlFor="subcity">{t('subcity') || 'Subcity'}</Label>
                 <Select
-                  value={formData.subcity?.toString()}
-                  onValueChange={(value) => handleInputChange('subcity', parseInt(value))}
+                  value={formData.subcity_id?.toString()}
+                  onValueChange={(value) => handleInputChange('subcity_id', parseInt(value))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder='Select Subcity' />
+                    <SelectValue placeholder={formData.subcity?.name_en} />
                   </SelectTrigger>
                   <SelectContent>
                     {Subcities.map((subcity) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { Sector } from '@/types/sector';
 import {
   Dialog,
@@ -15,6 +15,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useOrganization } from '@/hooks/use-organization';
 import { handleApiError, handleApiSuccess } from '@/lib/error-handler';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 interface AddSectorDialogProps {
   open: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -23,6 +32,7 @@ interface AddSectorDialogProps {
 const CreateSectorDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
   const { createSector } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+  const { Subcities } = useOrganization();
   const [formData, setFormData] = useState({
     name_en: '',
     name_af: '',
@@ -34,6 +44,7 @@ const CreateSectorDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
     office_location_en: '',
     office_location_am: '',
     office_location_af: '',
+    subcity_id: '',
   });
 
   const handleInputChange = (field: keyof Sector, value: string | number) => {
@@ -53,6 +64,7 @@ const CreateSectorDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
     data.append('office_location_en', formData.office_location_en);
     data.append('office_location_am', formData.office_location_am);
     data.append('office_location_af', formData.office_location_af);
+    data.append('subcity_id', formData.subcity_id);
 
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
@@ -81,6 +93,7 @@ const CreateSectorDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
       office_location_en: '',
       office_location_am: '',
       office_location_af: '',
+      subcity_id: '',
     });
     setIsOpen(false);
   };
@@ -98,6 +111,26 @@ const CreateSectorDialog = ({ open, setIsOpen }: AddSectorDialogProps) => {
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Select
+                  value={formData.subcity_id}
+                  onValueChange={(value) => handleInputChange("subcity_id", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a subcity" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      {Subcities.map((subcity) => (
+                        <SelectItem key={subcity.id} value={String(subcity.id)}>
+                          {subcity.name_en}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+             </div> 
               <div className="grid gap-2">
                 <Label htmlFor="name_en">Sector Name (English)</Label>
                 <Input

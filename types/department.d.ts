@@ -1,3 +1,4 @@
+import { Subcities } from "./subcities.d.ts"
 export interface Department {
   id: string;
   name_am: string;
@@ -14,6 +15,8 @@ export interface Department {
   created_at: string;
   sector_id: string;
   division_id: string;
+  subcity_id: string | null;
+  subcity: Subcities | null;
   created_at: string;
   updated_at: string;
 }
