@@ -14,6 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useOrganization } from '@/hooks/use-organization';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 
 interface EditSectorDialogProps {
   sector: Sector | null;
@@ -22,7 +31,7 @@ interface EditSectorDialogProps {
 }
 
 const EditSectorDialog = ({ sector, open, onOpenChange }: EditSectorDialogProps) => {
-  const { updateSectors } = useOrganization();
+  const { updateSectors, Subcities } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     id: sector?.id,
@@ -36,11 +45,26 @@ const EditSectorDialog = ({ sector, open, onOpenChange }: EditSectorDialogProps)
     office_location_en: '',
     office_location_am: '',
     office_location_af: '',
+    subcity_id: '',
+    // subcity: Subcitie
   });
 
   useEffect(() => {
     if (sector) {
-      setFormData(sector);
+      setFormData({
+        id: sector.id,
+        name_en: sector.name_en,
+        name_af: sector.name_af,
+        name_am: sector.name_am,
+        profile_picture: sector.profile_picture,
+        appointed_person_en: sector.appointed_person_en,
+        appointed_person_af: sector.appointed_person_af,
+        appointed_person_am: sector.appointed_person_am,
+        office_location_en: sector.office_location_en,
+        office_location_am: sector.office_location_am,
+        office_location_af: sector.office_location_af,
+        subcity_id: sector.subcity_id ?? "",
+      });
     }
   }, [sector]);
 
@@ -63,6 +87,7 @@ const EditSectorDialog = ({ sector, open, onOpenChange }: EditSectorDialogProps)
     data.append('office_location_en', formData.office_location_en);
     data.append('office_location_am', formData.office_location_am);
     data.append('office_location_af', formData.office_location_af);
+    data.append('subcity_id', formData.subcity_id)
 
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
@@ -78,7 +103,20 @@ const EditSectorDialog = ({ sector, open, onOpenChange }: EditSectorDialogProps)
   };
   const handleCancel = () => {
     if (sector) {
-      setFormData(sector);
+      setFormData({
+        id: sector.id,
+        name_en: sector.name_en,
+        name_af: sector.name_af,
+        name_am: sector.name_am,
+        profile_picture: sector.profile_picture,
+        appointed_person_en: sector.appointed_person_en,
+        appointed_person_af: sector.appointed_person_af,
+        appointed_person_am: sector.appointed_person_am,
+        office_location_en: sector.office_location_en,
+        office_location_am: sector.office_location_am,
+        office_location_af: sector.office_location_af,
+        subcity_id: sector.subcity_id ?? "",
+      });
     }
     onOpenChange(false);
   };
@@ -94,6 +132,25 @@ const EditSectorDialog = ({ sector, open, onOpenChange }: EditSectorDialogProps)
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Select
+              value={formData.subcity_id.toString()}
+              onValueChange={(value) => handleInputChange("subcity_id", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder='Change subcity to' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {Subcities.map((subcity) => (
+                    <SelectItem key={subcity.id} value={String(subcity.id)}>
+                      {subcity.name_en}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="name_en">Sector Name (English)</Label>
             <Input

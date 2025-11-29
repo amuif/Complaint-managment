@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Sector } from '@/types/sector';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,7 @@ import { Department } from '@/types/department';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -30,10 +30,10 @@ interface EditTeamDialogProps {
 }
 
 const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
-  const { updateTeam, Directors, Sectors } = useOrganization();
+  const { updateTeam, Directors, Sectors, Subcities } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
-    id: team?.id,
+    id: '',
     name_en: '',
     name_af: '',
     name_am: '',
@@ -41,16 +41,32 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
     appointed_person_en: '',
     appointed_person_af: '',
     appointed_person_am: '',
-    sector_id: team?.sector_id,
+    sector_id: '',
     office_location_en: '',
     office_location_am: '',
     office_location_af: '',
-    division_id: team?.division_id,
+    division_id: '',
+    subcity_id: '',
   });
 
   useEffect(() => {
     if (team) {
-      setFormData(team);
+      setFormData({
+        id: team.id,
+        name_en: team.name_en,
+        name_af: team.name_af,
+        name_am: team.name_am,
+        profile_picture: team.profile_picture,
+        appointed_person_en: team.appointed_person_en,
+        appointed_person_af: team.appointed_person_af,
+        appointed_person_am: team.appointed_person_am,
+        sector_id: team.sector_id,
+        office_location_en: team.office_location_en,
+        office_location_am: team.office_location_am,
+        office_location_af: team.office_location_af,
+        division_id: team.division_id,
+        subcity_id: team.subcity_id ?? '',
+      });
     }
     console.log('team edit', team);
   }, [team]);
@@ -62,6 +78,7 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
     }));
   };
 
+  useEffect(() => console.log('formData', formData), [formData])
   const handleSave = async () => {
     const data = new FormData();
     data.append('id', String(formData.id));
@@ -76,6 +93,7 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
     data.append('office_location_en', formData.office_location_en);
     data.append('office_location_am', formData.office_location_am);
     data.append('office_location_af', formData.office_location_af);
+    data.append('subcity_id', formData.subcity_id)
 
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
@@ -92,7 +110,22 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
   };
   const handleCancel = () => {
     if (team) {
-      setFormData(team);
+      setFormData({
+        id: team.id,
+        name_en: team.name_en,
+        name_af: team.name_af,
+        name_am: team.name_am,
+        profile_picture: team.profile_picture,
+        appointed_person_en: team.appointed_person_en,
+        appointed_person_af: team.appointed_person_af,
+        appointed_person_am: team.appointed_person_am,
+        sector_id: team.sector_id,
+        office_location_en: team.office_location_en,
+        office_location_am: team.office_location_am,
+        office_location_af: team.office_location_af,
+        division_id: team.division_id,
+        subcity_id: team.subcity_id ?? '',
+      });
     }
     onOpenChange(false);
   };
@@ -108,6 +141,26 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Select
+              value={formData.subcity_id.toString()}
+              onValueChange={(value) => handleInputChange("subcity_id", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder='Change subcity to' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {Subcities.map((subcity) => (
+                    <SelectItem key={subcity.id} value={String(subcity.id)}>
+                      {subcity.name_en}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid gap-2">
             <p>Sector</p>
             <Select

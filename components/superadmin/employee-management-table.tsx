@@ -60,6 +60,7 @@ export function EmployeeManagementTable({
   useEffect(() => {
     console.log('employees', employees);
   }, [employees]);
+  useEffect(() => console.log('id?', regionFilter), [regionFilter])
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
@@ -95,24 +96,45 @@ export function EmployeeManagementTable({
 
   // Filter employees based on search query and filters
   const filteredEmployees = employees.filter((employee: Employee) => {
-    const employeeName = `${employee.first_name_en} ${
-      employee.middle_name_en || ''
-    } ${employee.last_name_en}`.trim();
-    const matchesSearch =
-      employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.position_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.department.name_en.toLowerCase().includes(searchQuery.toLowerCase());
+    const employeeName = `${employee.first_name_en} ${employee.middle_name_en || ''} ${employee.last_name_en}`.trim();
 
-    const matchesRegion =
-      regionFilter === 'all' ||
-      (employee.city && employee.city.toLowerCase().replace(/\s+/g, '-') === regionFilter);
-    const matchesDepartment =
-      departmentFilter === 'all' ||
-      employee.department.name_en.toLowerCase().replace(/\s+/g, '-') === departmentFilter;
+    // Search filter
+    const matchesSearch = searchQuery === '' ||
+      employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.position_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.department?.name_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.sector?.name_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.division?.name_en?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Region filter - using subcity_id
+    const matchesRegion = regionFilter === 'all' ||
+      employee.subcity_id?.toString() === regionFilter.toString();
+
+    // Department filter - FIXED: Check what type of filter we're applying
+    let matchesDepartment = true;
+    if (departmentFilter !== 'all') {
+      // Check if the departmentFilter matches any of the organizational units
+      matchesDepartment =
+        employee.department_id?.toString() === departmentFilter.toString() ||
+        employee.sector_id?.toString() === departmentFilter.toString() ||
+        employee.division_id?.toString() === departmentFilter.toString();
+    }
+
+    console.log(`🔍 Employee ${employee.id} Filter Results:`, {
+      name: employeeName,
+      matchesSearch,
+      matchesRegion,
+      matchesDepartment,
+      employeeSubcity: employee.subcity_id,
+      filterRegion: regionFilter,
+      employeeDept: employee.department_id,
+      employeeSector: employee.sector_id,
+      employeeDivision: employee.division_id,
+      filterDept: departmentFilter
+    });
 
     return matchesSearch && matchesRegion && matchesDepartment;
   });
-
   // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
   const paginatedEmployees: Employee[] = filteredEmployees.slice(
@@ -144,9 +166,8 @@ export function EmployeeManagementTable({
                 </>
               ) : (
                 paginatedEmployees.map((employee) => {
-                  const employeeName = `${employee.first_name_en} ${
-                    employee.middle_name_en || ''
-                  } ${employee.last_name_en}`.trim();
+                  const employeeName = `${employee.first_name_en} ${employee.middle_name_en || ''
+                    } ${employee.last_name_en}`.trim();
                   const profilePictureUrl = employee.profile_picture || '/placeholder.svg';
                   return (
                     <TableRow key={employee.id}>

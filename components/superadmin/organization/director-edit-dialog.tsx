@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sector } from '@/types/sector';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +18,7 @@ import { handleApiSuccess } from '@/lib/error-handler';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -30,27 +30,42 @@ interface EditDirectorDialogProps {
 }
 
 const EditDirectorDialog = ({ division, open, onOpenChange }: EditDirectorDialogProps) => {
-  const { updateDirector, Sectors } = useOrganization();
+  const { updateDirector, Sectors, Subcities } = useOrganization();
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
-    id: division?.id,
+    id: '',
     name_en: '',
     name_af: '',
     name_am: '',
-    profile_picture: division?.profile_picture,
+    profile_picture:'',
     appointed_person_en: '',
     appointed_person_af: '',
     appointed_person_am: '',
     office_location_en: '',
     office_location_am: '',
     office_location_af: '',
-
-    sector_id: division?.sector_id,
+    sector_id: '',
+    subcity_id:  '',
   });
 
   useEffect(() => {
     if (division) {
-      setFormData(division);
+      setFormData({
+        id: division?.id,
+        name_en: division.name_en,
+        name_af: division.name_af,
+        name_am: division.name_am,
+        profile_picture: division?.profile_picture,
+        appointed_person_en: division.appointed_person_en,
+        appointed_person_af: division.appointed_person_af,
+        appointed_person_am: division.appointed_person_am,
+        office_location_en: division.office_location_en,
+        office_location_am: division.office_location_am,
+        office_location_af: division.office_location_af,
+        sector_id: division?.sector_id,
+        subcity_id: division.subcity_id ?? "",
+      });
+
     }
   }, [division]);
 
@@ -77,6 +92,9 @@ const EditDirectorDialog = ({ division, open, onOpenChange }: EditDirectorDialog
     if (formData.sector_id) {
       data.append('sector_id', formData.sector_id);
     }
+    if (formData.subcity_id) {
+      data.append('subcity_id', formData.subcity_id)
+    }
     if (profilePictureFile) {
       data.append('profile_picture', profilePictureFile);
     }
@@ -92,7 +110,21 @@ const EditDirectorDialog = ({ division, open, onOpenChange }: EditDirectorDialog
   };
   const handleCancel = () => {
     if (division) {
-      setFormData(division);
+      setFormData({
+        id: division?.id,
+        name_en: division.name_en,
+        name_af: division.name_af,
+        name_am: division.name_am,
+        profile_picture: division?.profile_picture,
+        appointed_person_en: division.appointed_person_en,
+        appointed_person_af: division.appointed_person_af,
+        appointed_person_am: division.appointed_person_am,
+        office_location_en: division.office_location_en,
+        office_location_am: division.office_location_am,
+        office_location_af: division.office_location_af,
+        sector_id: division?.sector_id,
+        subcity_id: division.subcity_id ?? "",
+      });
     }
     onOpenChange(false);
   };
@@ -108,6 +140,25 @@ const EditDirectorDialog = ({ division, open, onOpenChange }: EditDirectorDialog
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Select
+              value={formData.subcity_id.toString()}
+              onValueChange={(value) => handleInputChange("subcity_id", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder='Change subcity to' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {Subcities.map((subcity) => (
+                    <SelectItem key={subcity.id} value={String(subcity.id)}>
+                      {subcity.name_en}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid gap-2">
             <Select
               value={formData.sector_id || ''}
