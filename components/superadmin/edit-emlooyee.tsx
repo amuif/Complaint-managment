@@ -396,7 +396,7 @@ export function EditEmployee({ employee, children }: EditEmployeeProps) {
                     <SelectValue placeholder={'Select Team'} />
                   </SelectTrigger>
                   <SelectContent>
-                    {Directors.map((director) => (
+                    {Directors.filter((director) => parseInt(director.sector_id) == formData.sector_id).map((director) => (
                       <SelectItem key={director.id} value={director.id.toString()}>
                         {director.name_en}
                       </SelectItem>

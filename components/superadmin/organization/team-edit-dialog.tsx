@@ -190,7 +190,7 @@ const EditTeamDialog = ({ team, open, onOpenChange }: EditTeamDialogProps) => {
                 <SelectValue placeholder="Select Director" />
               </SelectTrigger>
               <SelectContent>
-                {Directors.map((division, index) => (
+                {Directors.filter((director) => director.sector_id === formData.sector_id).map((division, index) => (
                   <SelectItem key={index} value={division.id}>
                     {division.name_en}
                   </SelectItem>
