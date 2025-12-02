@@ -56,8 +56,8 @@ const employeeSchema = z.object({
   city: z.string().optional(),
   works_in_head_office: z.boolean().default(false).optional(),
   sector_id: z.string().min(1, 'Sector is required'),
-  department_id: z.string().min(1, 'Team is required'),
-  division_id: z.string().min(1, 'Director is required'),
+  department_id: z.string().min(1, 'Team must be selected if provided').optional().or(z.literal(''))
+  , division_id: z.string().min(1, 'Director is required'),
   subcity_id: z.string().optional(),
   office_number: z.string().min(1, 'Office number is required'),
   floor_number: z.string().refine((val) => !Number.isNaN(Number(val)), {
@@ -150,6 +150,7 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
   useEffect(() => {
     console.log('Form errors:', errors);
   }, [errors]);
+
   const onSubmit = async (formData: EmployeeFormData) => {
     try {
       const payload = new FormData();
@@ -211,10 +212,16 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 <div>
                   <Label>First Name (Amharic)</Label>
                   <Input {...register('first_name_am')} placeholder="ጆን" />
+                  {errors.first_name_am && (
+                    <p className="text-red-500 text-sm">{errors.first_name_am.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label>First Name (Afaan Oromo)</Label>
                   <Input {...register('first_name_af')} placeholder="Johni" />
+                  {errors.first_name_af && (
+                    <p className="text-red-500 text-sm">{errors.first_name_af.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -222,14 +229,23 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 <div>
                   <Label>Middle Name (English)</Label>
                   <Input {...register('middle_name_en')} placeholder="Michael" />
+                  {errors.middle_name_en && (
+                    <p className="text-red-500 text-sm">{errors.middle_name_en.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Middle Name (Amharic)</Label>
                   <Input {...register('middle_name_am')} placeholder="ሚካኤል" />
+                  {errors.middle_name_am && (
+                    <p className="text-red-500 text-sm">{errors.middle_name_am.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Middle Name (Afaan Oromo)</Label>
                   <Input {...register('middle_name_af')} placeholder="Mikaeli" />
+                  {errors.middle_name_af && (
+                    <p className="text-red-500 text-sm">{errors.middle_name_af.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -244,10 +260,16 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 <div>
                   <Label>Last Name (Amharic)</Label>
                   <Input {...register('last_name_am')} placeholder="ስሚዝ" />
+                  {errors.last_name_am && (
+                    <p className="text-red-500 text-sm">{errors.last_name_am.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Last Name (Afaan Oromo)</Label>
                   <Input {...register('last_name_af')} placeholder="Smitii" />
+                  {errors.last_name_af && (
+                    <p className="text-red-500 text-sm">{errors.last_name_af.message}</p>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -264,87 +286,111 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 <div>
                   <Label>Position (Amharic)</Label>
                   <Input {...register('position_am')} placeholder="ከፍተኛ ባለሙያ" />
+                  {errors.position_am && (
+                    <p className="text-red-500 text-sm">{errors.position_am.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Position (Afaan Oromo)</Label>
                   <Input {...register('position_af')} placeholder="Ogeessa Ol'aanaa" />
+                  {errors.position_af && (
+                    <p className="text-red-500 text-sm">{errors.position_af.message}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
                 {/* Sector */}
-                <Controller
-                  control={control}
-                  name="sector_id"
-                  render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                        const sector = Sectors.find((s) => String(s.id) === val) || null;
-                        setSelectedSector(sector);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={selectedSector?.name_en ?? 'Select Sector'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Sectors.map((sector) => (
-                          <SelectItem key={sector.id} value={String(sector.id)}>
-                            {sector.name_en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div>
+                  <Label>Sector *</Label>
+                  <Controller
+                    control={control}
+                    name="sector_id"
+                    render={({ field }) => (
+                      <Select
+                        value={String(field.value)}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          const sector = Sectors.find((s) => String(s.id) === val) || null;
+                          setSelectedSector(sector);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={selectedSector?.name_en ?? 'Select Sector'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Sectors.map((sector) => (
+                            <SelectItem key={sector.id} value={String(sector.id)}>
+                              {sector.name_en}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.sector_id && (
+                    <p className="text-red-500 text-sm">{errors.sector_id.message}</p>
                   )}
-                />
+                </div>
 
                 {/* Director */}
-                <Controller
-                  control={control}
-                  name="division_id"
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                        const director = Directors.find((d) => String(d.id) === val) || null;
-                        setSelectedDirector(director);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={selectedDirector?.name_en || 'Select director'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredDirectors.map((director) => (
-                          <SelectItem key={director.id} value={String(director.id)}>
-                            {director.name_en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div>
+                  <Label>Director *</Label>
+                  <Controller
+                    control={control}
+                    name="division_id"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          const director = Directors.find((d) => String(d.id) === val) || null;
+                          setSelectedDirector(director);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={selectedDirector?.name_en || 'Select director'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredDirectors.map((director) => (
+                            <SelectItem key={director.id} value={String(director.id)}>
+                              {director.name_en}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.division_id && (
+                    <p className="text-red-500 text-sm">{errors.division_id.message}</p>
                   )}
-                />
+                </div>
 
                 {/* Team */}
-                <Controller
-                  control={control}
-                  name="department_id"
-                  render={({ field }) => (
-                    <Select value={String(field.value)} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Team" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredTeams.map((team) => (
-                          <SelectItem key={team.id} value={String(team.id)}>
-                            {team.name_en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div>
+                  <Label>Team *</Label>
+                  <Controller
+                    control={control}
+                    name="department_id"
+                    render={({ field }) => (
+                      <Select value={String(field.value)} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Team" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredTeams.map((team) => (
+                            <SelectItem key={team.id} value={String(team.id)}>
+                              {team.name_en}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.department_id && (
+                    <p className="text-red-500 text-sm">{errors.department_id.message}</p>
                   )}
-                />
+                </div>
               </div>
             </TabsContent>
 
@@ -446,7 +492,7 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
                 </Button>
               </div>
               {errors.profile_picture && (
-                <p className="text-red-500 text-sm">{'Profile picutre is required'}</p>
+                <p className="text-red-500 text-sm">{'Profile picture is required'}</p>
               )}
             </TabsContent>
           </Tabs>
@@ -467,6 +513,5 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>);
 }
