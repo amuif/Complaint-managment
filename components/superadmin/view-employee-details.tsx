@@ -28,7 +28,7 @@ export function ViewEmployeeDetails({ employee, children }: ViewEmployeeDetailsP
   const [open, setOpen] = useState(false);
 
   const employeeName =
-    `${employee.first_name_en} ${employee.middle_name_en || ''} ${employee.last_name_en}`.trim();
+    `${employee?.first_name_en} ${employee?.middle_name_en || ''} ${employee?.last_name_en}`.trim();
 
   const profilePictureUrl = employee.profile_picture || '/placeholder.svg?height=120&width=120';
 
@@ -54,20 +54,15 @@ export function ViewEmployeeDetails({ employee, children }: ViewEmployeeDetailsP
                     alt={employeeName}
                   />
                   <AvatarFallback className="text-lg">
-                    {employee.first_name_en?.charAt(0) || 'E'}
-                    {employee.last_name_en?.charAt(0) || ''}
+                    {employee?.first_name_en?.charAt(0) || 'E'}
+                    {employee?.last_name_en?.charAt(0) || ''}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold">{employeeName}</h3>
-                  <p className="text-muted-foreground">{employee.position_en}</p>
+                  <p className="text-muted-foreground">{employee?.position_en}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline">{employee.department.name_en}</Badge>
-                    <div className="flex items-center">
-                      <Star className="mr-1 h-4 w-4 fill-primary text-primary" />
-                      <span className="font-medium">4.5</span>
-                      <span className="text-muted-foreground">/5</span>
-                    </div>
+                    <Badge variant="outline">{employee?.department?.name_en}</Badge>
                   </div>
                 </div>
               </div>

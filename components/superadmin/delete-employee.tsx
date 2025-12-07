@@ -80,7 +80,7 @@ export function DeleteEmployee({ employee, children, onDelete }: DeleteEmployeeP
                 <div>
                   <div className="font-medium">{employeeName}</div>
                   <div className="text-sm text-muted-foreground">
-                    {employee.position_en} • {employee.department.name_en}
+                    {employee?.position_en} • {employee?.department?.name_en}
                   </div>
                 </div>
               </div>

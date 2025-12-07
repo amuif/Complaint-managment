@@ -196,6 +196,8 @@ export default function SuperAdminDashboardPage() {
               {t('viewAll')}
             </Button>
           </div>
+        
+        
         </CardHeader>
         <CardContent>
           <RecentActivitySuperAdmin />
