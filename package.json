@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
-    "build-dev":"next build",
+    "build-dev": "next build",
     "postbuild": "cp -r .next/static .next/standalone/.next/static || true",
     "start": "next start --port=3001",
     "lint": "next lint",
@@ -51,7 +51,7 @@
     "immer": "latest",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "15.2.4",
+    "next": "15.2.8",
     "next-themes": "latest",
     "react": "^19.1.0",
     "react-date-range": "^2.0.1",
