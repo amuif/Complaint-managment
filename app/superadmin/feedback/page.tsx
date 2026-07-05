@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import type { DateRange } from 'react-day-picker';
-import { addDays, isWithinInterval, parseISO } from 'date-fns';
+import { addYears, isWithinInterval, parseISO } from 'date-fns';
 import { Star } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +42,7 @@ function FeedbackPageContent() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: addDays(new Date(), -30),
+    from: addYears(new Date(), -1),
     to: new Date(),
   });
   const [responseDialog, setResponseDialog] = useState<{
@@ -63,19 +63,15 @@ function FeedbackPageContent() {
     isRespondingToPublicFeedback,
   } = useFeedback();
 
-  // Safely combine both feedback sources
-  const allFeedback = [
-    ...(Array.isArray(feedback) ? feedback : []),
-    ...(Array.isArray(publicFeedback) ? publicFeedback : []),
-  ];
 
-  useEffect(() => console.log(feedback), [allFeedback]);
-  useEffect(() => {
-    console.log(responseDialog.feedback);
-  }, [responseDialog]);
+
+  useEffect(() => console.log(feedback), [feedback]);
+  // useEffect(() => {
+  //   console.log(responseDialog.feedback);
+  // }, [responseDialog]);
   // Filter feedback by type and search criteria
   const filterByType = (type: 'all' | 'positive' | 'negative' | 'neutral') => {
-    return allFeedback.filter((fb) => {
+    return feedback.filter((fb) => {
       if (!fb) return false;
 
       // Map feedback_type to sentiment category
@@ -234,35 +230,37 @@ function FeedbackPageContent() {
                 </td>
               </tr>
             ) : (
-              filtered.map((fb, idx) => (
-                <tr
-                  key={fb.id}
-                  className={`border-b last:border-0 transition-colors ${
-                    idx % 2 === 0 ? 'bg-background' : 'bg-muted/50'
-                  } hover:bg-primary/5`}
-                >
-                  <td className="px-4 py-2 font-medium flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {fb.phone_number ? fb.phone_number.slice(-2) : '??'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{fb.phone_number}</span>
-                  </td>
-
-                  <td className="px-4 py-2">{fb?.full_name || 'anonymus'}</td>
-                  <td className="px-4 py-2">{fb?.feedback_type || 'unassigned'}</td>
-                  <td
-                    className="px-4 py-2 max-w-xs truncate"
-                    title={fb.feedback_text}
-                    style={{ whiteSpace: 'normal' }}
+              filtered.map((fb, idx) => {
+                console.log("Fb", fb)
+                return (
+                  <tr
+                    key={fb.id}
+                    className={`border-b last:border-0 transition-colors ${idx % 2 === 0 ? 'bg-background' : 'bg-muted/50'
+                      } hover:bg-primary/5`}
                   >
-                    {fb.feedback_text}
-                  </td>
+                    <td className="px-4 py-2 font-medium flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>
+                          {fb.phone_number ? fb.phone_number.slice(-2) : '??'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{fb.phone_number}</span>
+                    </td>
 
-                  <td className="px-4 py-2">{new Date(fb.created_at).toLocaleDateString()}</td>
-                </tr>
-              ))
+                    <td className="px-4 py-2">{fb?.full_name || 'anonymus'}</td>
+                    <td className="px-4 py-2">{fb?.feedback_type || 'unassigned'}</td>
+                    <td
+                      className="px-4 py-2 max-w-xs truncate"
+                      title={fb.feedback_text}
+                      style={{ whiteSpace: 'normal' }}
+                    >
+                      {fb.feedback_text}
+                    </td>
+
+                    <td className="px-4 py-2">{new Date(fb.created_at).toLocaleDateString()}</td>
+                  </tr>
+                )
+              })
             )}
           </tbody>
         </table>
@@ -297,7 +295,7 @@ function FeedbackPageContent() {
             <CardTitle className="text-sm font-medium">Total Feedback</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allFeedback.length}</div>
+            <div className="text-2xl font-bold">{feedback.length}</div>
           </CardContent>
         </Card>
         <Card>
