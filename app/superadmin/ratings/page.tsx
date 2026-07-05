@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import type { DateRange } from 'react-day-picker';
-import { addDays, isWithinInterval, parseISO } from 'date-fns';
+import { addYears, isWithinInterval, parseISO } from 'date-fns';
 import { Star, TrendingUp, Users, Award } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,7 @@ function RatingsPageContent() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: addDays(new Date(), -30),
+    from: addYears(new Date(), -1),
     to: new Date(),
   });
 
