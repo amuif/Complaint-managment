@@ -377,7 +377,7 @@ export function ComplaintManagementTable({
                       <div className="font-medium">
                         {complaint?.department?.name_en ||
                           complaint.division?.name_en ||
-                          complaint.sector.name_en ||
+                          complaint.sector?.name_en ||
                           'Unassigned'}
                       </div>
                       <div className="text-sm text-muted-foreground">
