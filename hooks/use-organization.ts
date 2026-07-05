@@ -104,12 +104,12 @@ export function useOrganization() {
       return adminApi.deleteTeam(id, token);
     },
   });
-  const getExpertiseQuery = useQuery({
-    queryKey: ['get-expertise'],
-    queryFn: async () => {
-      return publicApi.getExpertise(language);
-    },
-  });
+  // const getExpertiseQuery = useQuery({
+  //   queryKey: ['get-expertise'],
+  //   queryFn: async () => {
+  //     return publicApi.getExpertise(language);
+  //   },
+  // });
 
   const getSubcitiesQuery = useQuery({
     queryKey: ['get-subcities'],
@@ -133,7 +133,7 @@ export function useOrganization() {
     createTeam: createTeamQuery.mutateAsync || [],
     updateTeam: updateTeamQuery.mutateAsync || [],
     deleteTeam: deleteTeamQuery.mutateAsync || [],
-    Expertise: getExpertiseQuery.data || [],
+    // Expertise: getExpertiseQuery.data || [],
     Subcities: getSubcitiesQuery.data || [],
   };
 }

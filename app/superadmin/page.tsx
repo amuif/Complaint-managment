@@ -111,7 +111,7 @@ export default function SuperAdminDashboardPage() {
       {/* Stats cards - With real data */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          title={t('totalComplaints')}
+          title={'Total complaints'}
           value={totalComplaints.toLocaleString()}
           icon={MessageSquare}
           color="bg-red-500/10 text-red-500"
@@ -119,7 +119,7 @@ export default function SuperAdminDashboardPage() {
         />
 
         <StatCard
-          title={t('resolvedComplaints')}
+          title={"Resolved complaints"}
           value={resolvedComplaints.toLocaleString()}
           icon={TrendingUp}
           color="bg-green-500/10 text-green-500"
@@ -127,7 +127,7 @@ export default function SuperAdminDashboardPage() {
         />
 
         <StatCard
-          title={t('totalFeedback')}
+          title={'Total feedback'}
           value={totalFeedback}
           icon={FileText}
           color="bg-blue-500/10 text-blue-500"
@@ -135,7 +135,7 @@ export default function SuperAdminDashboardPage() {
         />
 
         <StatCard
-          title={t('averageRating')}
+          title={'Average rating'}
           value={allRatings.length}
           icon={Star}
           color="bg-amber-500/10 text-amber-500"
@@ -143,8 +143,8 @@ export default function SuperAdminDashboardPage() {
         />
 
         <StatCard
-          title={t('totalEmployees')}
-          value={totalEmployees}
+          title={'Total employees'}
+          value={totalEmployees.toLocaleString()}
           icon={Users}
           color="bg-blue-500/10 text-blue-500"
           isLoading={isLoading}

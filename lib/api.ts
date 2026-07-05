@@ -12,9 +12,10 @@ import { Subcities } from '@/types/subcities';
 import { Feedback } from '@/types/feedback';
 import { User } from '@/types/user';
 import { ActivityLog } from '@/types/notifications';
+import { BASE_URL } from '@/constants/base_url';
 
 // Base API configuration and helper functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://196.189.93.235:4000/api';
+const API_BASE_URL = BASE_URL;
 
 export interface Service {
   id: number;
@@ -169,10 +170,10 @@ export const publicApi = {
     const response = await fetch(withLang(`${API_BASE_URL}/departments`, lang));
     return handleDataResponse<Department[]>(response);
   },
-  getExpertise: async (lang?: string): Promise<Team[]> => {
-    const response = await fetch(withLang(`${API_BASE_URL}/teams`, lang));
-    return handleResponse<Team[]>(response);
-  },
+  // getExpertise: async (lang?: string): Promise<Team[]> => {
+  //   const response = await fetch(withLang(`${API_BASE_URL}/teams`, lang));
+  //   return handleResponse<Team[]>(response);
+  // },
 
   // Get offices by department
   getOfficesByDepartment: async (departmentId: number, lang?: string): Promise<Office[]> => {
